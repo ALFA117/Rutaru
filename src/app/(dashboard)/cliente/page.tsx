@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { logout } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { actualizarConsentimientoAction } from "@/lib/perfil/actions";
 import type { ListingTipo } from "@/lib/data/listings";
 
 const currency = new Intl.NumberFormat("es-MX", {
@@ -100,6 +102,32 @@ export default async function ClientePage() {
           />
         ))}
       </div>
+
+      <Card className="mt-10">
+        <CardHeader>
+          <CardTitle className="font-heading text-lg">Privacidad de tus datos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action={actualizarConsentimientoAction}>
+            <label className="flex items-start gap-2 text-sm">
+              <Checkbox
+                name="consiente"
+                value="on"
+                defaultChecked={profile.consiente_datos_agregados}
+                className="mt-0.5"
+              />
+              <span className="text-muted-foreground">
+                Permitir que mi actividad se use de forma agregada y anónima
+                (nunca mi nombre, correo o identidad) en el Data Marketplace
+                de Rutaru.
+              </span>
+            </label>
+            <Button type="submit" size="sm" variant="outline" className="mt-3">
+              Guardar preferencia
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

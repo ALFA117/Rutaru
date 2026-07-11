@@ -18,9 +18,9 @@ const ETAPAS = [
   {
     numero: 3,
     nombre: "B2B + Data Marketplace",
-    estado: "pendiente" as const,
+    estado: "completa" as const,
     descripcion:
-      "Portal de agencias, constructor de paquetes, tarifas netas B2B y venta de paquetes de datos.",
+      "Portal de agencias con tarifa neta y allotments, constructor de paquetes cross-categoría, Data Marketplace con paquetes de datos agregados/anonimizados y resumen ejecutivo con IA.",
   },
   {
     numero: 4,

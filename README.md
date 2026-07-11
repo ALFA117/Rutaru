@@ -4,7 +4,7 @@
 
 Marketplace turístico B2B/B2C (rutas, hospedaje, traslados, eventos, paquetes de agencia) con un motor de inteligencia de datos como diferenciador. Ver `PROMPT_MAESTRO_RUTARU.md` para el spec completo del producto.
 
-**Estado:** Etapas 1 (Esqueleto) y 2 (Inteligencia) completas. Roadmap público en `/roadmap`. Ver `CHANGELOG.md` para el detalle de cada bloque.
+**Estado:** Etapas 1 (Esqueleto), 2 (Inteligencia) y 3 (B2B + Data Marketplace) completas. Roadmap público en `/roadmap`. Ver `CHANGELOG.md` para el detalle de cada bloque.
 
 ## Stack
 
@@ -19,33 +19,40 @@ Marketplace turístico B2B/B2C (rutas, hospedaje, traslados, eventos, paquetes d
 ```
 src/
 ├── app/
-│   ├── (marketplace)/       # home, categorías, detalle, carrito, checkout, roadmap
+│   ├── (marketplace)/       # home, categorías, detalle, carrito, checkout, roadmap,
+│   │                        # paquete/[slug], datos (Data Marketplace público)
 │   ├── (auth)/login|registro/
-│   ├── (dashboard)/{operador,agencia,admin,afiliado,cliente}/    # dashboards reales con Recharts
-│   └── api/{checkout,tracking,chat,insights/generate}/
-├── components/{ui,marketplace,layout,dashboard,chatbot}/
+│   ├── (dashboard)/{operador,agencia,admin,afiliado,cliente}/    # dashboards reales
+│   │   ├── agencia/{catalogo,comprar,ordenes/[ordenId],paquetes/nuevo}/
+│   │   └── admin/datos/{,/nuevo}
+│   └── api/{checkout,tracking,chat,insights/generate,data-packages/[id]/download}/
+├── components/{ui,marketplace,layout,dashboard,chatbot,b2b,data-marketplace}/
 ├── lib/
 │   ├── supabase/{client,server,admin}.ts   # admin.ts = service role, server-only
 │   ├── auth/{roles,guards,actions}.ts
 │   ├── afiliado/actions.ts                 # regenerar codigo, solicitar pago
+│   ├── perfil/actions.ts                   # consentimiento de datos agregados
 │   ├── cart/actions.ts
+│   ├── b2b/{allotments,actions,paquetes,actions-paquetes}.ts
+│   ├── data-marketplace/{actions,compra-actions,resumen-actions}.ts
 │   ├── ai/provider.ts                      # abstraccion IA (Gemini + mock)
 │   ├── data/{listings,categorias,cart,orders,detail-href,
 │   │         dashboard-operador,dashboard-agencia,dashboard-admin,
 │   │         dashboard-afiliado,dashboard-cliente,recommendations,
-│   │         insights,chatbot-catalogo}.ts
+│   │         insights,chatbot-catalogo,catalogo-b2b,b2b-orders,
+│   │         data-packages,data-packages-metrics,data-packages-export}.ts
 │   ├── tracking/track.ts
 │   └── pioneer-pay/sandbox.ts
 ├── proxy.ts                 # refresco de sesión + cookie de tracking (Next 16: reemplaza middleware.ts)
 └── config/{site,flags}.ts
 
-supabase/migrations/          # 0001-0015, ver docs/ERD.md
+supabase/migrations/          # 0001-0020, ver docs/ERD.md
 scripts/
 ├── db/migrate.mjs            # aplica migraciones sin Docker (session pooler)
-└── seed/{01_inventory,02_demo_users}.mjs
+└── seed/{01_inventory,02_demo_users,03_data_packages}.mjs
 ```
 
-Diagrama ER completo y el patrón de RLS (6 plantillas reutilizables en las 18 tablas): ver [`docs/ERD.md`](docs/ERD.md).
+Diagrama ER completo y el patrón de RLS en [`docs/ERD.md`](docs/ERD.md). Nota importante de Etapa 3: `listings.precio_neto_b2b` (tarifa neta B2B) **no** es visible vía RLS de fila — se oculta usando la vista `listings_publico` (sin esa columna) para todo consumo público/cliente/afiliado, ya que RLS de Postgres filtra filas, no columnas.
 
 ## Los 5 roles
 
@@ -69,6 +76,7 @@ cp .env.example .env.local   # completar con las keys del proyecto Supabase
 npm run db:migrate           # aplica supabase/migrations/ (incremental, sin Docker)
 npm run seed:inventory       # 8 rutas, 10 traslados, 15 hospedajes, 8 eventos, paquetes, afiliados
 npm run seed:demo-users      # crea los 5 usuarios demo si no existen
+npm run seed:data-packages   # 3 paquetes de datos reales para /datos
 npm run dev
 ```
 
@@ -87,7 +95,7 @@ Ver la página pública [`/roadmap`](http://localhost:3000/roadmap) y el detalle
 
 1. **Esqueleto** (completa) — auth, esquema BD, seeds, marketplace, checkout sandbox, tracking básico.
 2. **Inteligencia** (completa) — dashboards por rol, insights con Gemini, chatbot concierge, recomendador, módulo de afiliados.
-3. **B2B + Data Marketplace** — portal de agencias, tarifas netas, venta de datos (data_packages).
+3. **B2B + Data Marketplace** (completa) — catálogo con tarifa neta, allotments, paquetes cross-categoría, Data Marketplace (4 paquetes reales, export CSV/JSON, resumen con IA), consentimiento de datos.
 4. **Blockchain (Plan B)** — contratos Sepolia, NFT-tickets, escrow, comisiones on-chain.
 5. **Producción** — pasarela real, KYC, multi-idioma/moneda, mainnet, apps móviles.
 

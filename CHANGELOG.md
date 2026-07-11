@@ -56,13 +56,44 @@ Regenerar `codigo_5`/`codigo_10` desde el dashboard, solicitud de pago de comisi
 
 ---
 
+## Etapa 3 — B2B + Data Marketplace (completa)
+
+### Bloque 1 — Catálogo B2B con tarifa neta + separación real por columna
+RLS de Postgres filtra filas, no columnas: `listings.precio_neto_b2b` no se podía ocultar de clientes/afiliados mientras la tabla tuviera una política pública. Fix: migración `0016` retira el acceso público a `listings` y crea la vista `listings_publico` (sin esa columna) para todo consumo público/cliente/afiliado/chatbot/recomendador; la tabla base queda solo para agencia/admin/operador dueño. `/agencia/catalogo` muestra tarifa neta y margen potencial. Verificado explícitamente con sesión real de los 5 roles + anónimo.
+
+### Bloque 2 — Compra de allotments B2B
+`/agencia/comprar`: fecha real (de `disponibilidad`) + cantidad de cupos, descuento por volumen (10+: 5%, 20+: 10%), descuenta disponibilidad real, orden tipo `b2b` con estados cotizado→confirmado→pagado (`/agencia/ordenes/[ordenId]`) vía Pioneer sandbox. Única política RLS nueva: agencia puede actualizar disponibilidad de listings ajenos (migración `0017`).
+
+### Bloque 3 — Constructor de paquetes mejorado + `/paquete/[slug]`
+Migración `0018` agrega `slug` único a paquetes. `/agencia/paquetes/nuevo`: combina componentes reales cross-categoría (traslado+hotel+tour+evento) desde el catálogo B2B, markup % y precio calculado en vivo. Página pública propia por paquete.
+
+### Bloque 4 — Dashboard de agencia ampliado
+Márgenes por paquete, órdenes B2B con estado, allotments comprados vs. vendidos en el mercado (todos los canales). Fix: ese último dato requiere leer órdenes de otros usuarios — se usa el cliente admin solo para el conteo agregado, nunca expone qué cliente compró qué.
+
+### Bloque 5 — Constructor de paquetes de datos (admin)
+`/admin/datos/nuevo`: métricas reales (ventas por destino, demografía de compradores por ciudad/país, tendencias por temporada, funnel de conversión) calculadas en vivo, preview con Recharts. `demografia` usa el cliente admin (agregado por conteo, nunca PII individual).
+
+### Bloque 6 — Export CSV/JSON agregado y anonimizado
+`api/data-packages/[id]/download` aplana el preview a filas metrica/categoría/valor — nunca nombres, correos ni IDs.
+
+### Bloque 7 — Página pública `/datos` + compra simulada
+`scripts/seed/03_data_packages.mjs` crea 3 paquetes reales (el spec de Etapa 1 los había diferido aquí). Migración `0019` agrega lectura pública de `data_packages` (solo publicado/vendido). Compra simulada por empresa ficticia vía cliente admin (acción acotada, no abre UPDATE público).
+
+### Bloque 8 — Resumen ejecutivo con Gemini
+Reutiliza `lib/ai/provider.ts` para escribir la descripción comercial de cada paquete de datos a partir de su preview real.
+
+### Bloque 9 — Consentimiento de datos
+`profiles.consiente_datos_agregados` (migración `0020`, default `true`), visible y editable en `/registro` (checkbox), `/checkout` (texto informativo) y `/cliente` (toggle).
+
+---
+
 ## Checklist de criterios de aceptación (sección 9 del spec)
 
 - [x] Repo con estructura de carpetas clara, `.env.example`, migraciones SQL, seeds.
 - [ ] Contratos con tests de Hardhat — **Etapa 4** (Plan B blockchain).
-- [x] Los 5 logins demo funcionan y cada rol ve solo lo suyo (RLS probado — ver Bloque 3/6 Etapa 1 y Bloques 1-4 Etapa 2).
+- [x] Los 5 logins demo funcionan y cada rol ve solo lo suyo (RLS probado en las 3 etapas, incluida la tarifa neta B2B en Etapa 3).
 - [x] Flujo demostrable: cliente busca → aplica código de afiliado 10% → paga en Pioneer sandbox → orden creada → comisión al afiliado → tracking registrado → insight aparece en dashboard del admin (verificado end-to-end).
 - [ ] NFT-ticket en Sepolia con link a Etherscan — **Etapa 4** (Plan B).
-- [ ] Data Marketplace con 3 paquetes de datos con gráficas de preview — **Etapa 3** (tabla `data_packages` existe, sin poblar aún).
+- [x] Data Marketplace con 3+ paquetes de datos con gráficas de preview — 4 paquetes reales en `/datos`, con export CSV/JSON y resumen ejecutivo con IA.
 - [x] UI con identidad de rutaru.com, eslogan "pocas rutas, todas buenas.", responsive, diseñada con `ui-ux-pro-max`.
 - [x] README con arquitectura, diagrama ER, guía de faucets Sepolia y roadmap por etapas.

@@ -25,6 +25,7 @@ export type Database = {
           pais: string | null;
           ciudad: string | null;
           verificado: boolean;
+          consiente_datos_agregados: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -39,6 +40,7 @@ export type Database = {
           pais?: string | null;
           ciudad?: string | null;
           verificado?: boolean;
+          consiente_datos_agregados?: boolean;
           created_at?: string;
           updated_at?: string;
         };

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCartItems, cartItemPrice, cartItemTitle } from "@/lib/data/cart";
@@ -19,6 +20,12 @@ export default async function CheckoutPage() {
 
   const items = await getCartItems(user.id);
   if (items.length === 0) redirect("/carrito");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("consiente_datos_agregados")
+    .eq("id", user.id)
+    .single();
 
   const subtotal = items.reduce(
     (acc, item) => acc + item.cantidad * cartItemPrice(item),
@@ -53,6 +60,23 @@ export default async function CheckoutPage() {
           </div>
           <p className="text-xs text-muted-foreground">
             El descuento del código de afiliado se aplica al confirmar el pago.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {profile?.consiente_datos_agregados ? (
+              <>
+                Tu actividad en Rutaru se usa de forma agregada y anónima para
+                nuestro Data Marketplace.
+              </>
+            ) : (
+              <>
+                No compartes tus datos de forma agregada — tu compra igual se
+                procesa con normalidad.
+              </>
+            )}{" "}
+            <Link href="/cliente" className="underline">
+              Administra esto en tu cuenta
+            </Link>
+            .
           </p>
         </CardContent>
       </Card>

@@ -6,6 +6,7 @@ import { registro } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -57,6 +58,25 @@ export default function RegistroPage() {
                   required
                 />
               </div>
+              <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                <Checkbox
+                  name="consienteDatosAgregados"
+                  value="on"
+                  defaultChecked
+                  className="mt-0.5"
+                />
+                <span>
+                  Acepto que mi actividad en Rutaru se use de forma{" "}
+                  <strong>agregada y anónima</strong> (nunca mi nombre, correo
+                  o identidad) para generar estadísticas y venderlas en
+                  nuestro{" "}
+                  <Link href="/datos" className="underline">
+                    Data Marketplace
+                  </Link>
+                  . Puedes cambiar esto después desde tu cuenta.
+                </span>
+              </label>
+
               {state?.error && (
                 <p role="alert" className="text-sm text-destructive">
                   {state.error}
