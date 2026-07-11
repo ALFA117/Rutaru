@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import type { Listing } from "@/lib/data/listings";
 import type { Database } from "@/types/database.types";
+import { addToCartAction } from "@/lib/cart/actions";
 
 type Disponibilidad = Database["public"]["Tables"]["disponibilidad"]["Row"];
 type Resena = Database["public"]["Tables"]["resenas"]["Row"];
@@ -151,12 +152,12 @@ export function ListingDetail({
                 Consulta disponibilidad directamente.
               </p>
             )}
-            <Button size="lg" disabled title="Se activa en el Bloque 6 (checkout)">
-              Reservar
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              El carrito y checkout llegan en el siguiente bloque de la Etapa 1.
-            </p>
+            <form action={addToCartAction}>
+              <input type="hidden" name="listingId" value={listing.id} />
+              <Button size="lg" type="submit" className="w-full">
+                Agregar al carrito
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>
