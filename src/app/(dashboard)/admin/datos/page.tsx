@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/guards";
 import { getDataPackages } from "@/lib/data/data-packages";
 import { DataPackagePreview } from "@/components/data-marketplace/data-package-preview";
+import { generarResumenAction } from "@/lib/data-marketplace/resumen-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,12 @@ export default async function AdminDataPackagesPage() {
                       Descargar JSON
                     </a>
                   </Button>
+                  <form action={generarResumenAction}>
+                    <input type="hidden" name="dataPackageId" value={p.id} />
+                    <Button size="sm" variant="outline" type="submit">
+                      Generar resumen con IA
+                    </Button>
+                  </form>
                 </div>
               </CardContent>
             </Card>
