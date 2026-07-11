@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/auth/guards";
 import { getCatalogoB2B } from "@/lib/data/catalogo-b2b";
 import {
@@ -9,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -37,6 +39,7 @@ export default async function CatalogoB2BPage() {
               <TableHead className="text-right">Precio público</TableHead>
               <TableHead className="text-right">Tarifa neta</TableHead>
               <TableHead className="text-right">Margen</TableHead>
+              <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -56,6 +59,13 @@ export default async function CatalogoB2BPage() {
                 </TableCell>
                 <TableCell className="text-right tabular-nums text-accent">
                   {currency.format(l.margen)} ({l.margenPct}%)
+                </TableCell>
+                <TableCell>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href={`/agencia/comprar?listingId=${l.id}`}>
+                      Comprar bloque
+                    </Link>
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
