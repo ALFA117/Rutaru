@@ -4,13 +4,13 @@
 
 Marketplace turístico B2B/B2C (rutas, hospedaje, traslados, eventos, paquetes de agencia) con un motor de inteligencia de datos como diferenciador. Ver `PROMPT_MAESTRO_RUTARU.md` para el spec completo del producto.
 
-**Estado:** Etapa 1 (Esqueleto) completa. Roadmap público en `/roadmap`. Ver `CHANGELOG.md` para el detalle de cada bloque.
+**Estado:** Etapas 1 (Esqueleto) y 2 (Inteligencia) completas. Roadmap público en `/roadmap`. Ver `CHANGELOG.md` para el detalle de cada bloque.
 
 ## Stack
 
 - **Frontend:** Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + shadcn/ui + Recharts + Framer Motion
 - **Backend/BD:** Supabase (Postgres + Auth + RLS + Storage + Edge Functions + Realtime)
-- **IA:** Anthropic API (Etapa 2 — chatbot concierge, motor de insights; no usada aún)
+- **IA:** Google Gemini (`@google/genai`, modelo `gemini-flash-latest`) vía `lib/ai/provider.ts` — capa de abstracción intercambiable a otro proveedor. `AI_MODE=live|mock` con fallback automático a datos mock si Gemini falla.
 - **Pagos:** Pioneer Pay (pasarela sandbox/emulada, siempre aprueba en Etapa 1)
 - **Blockchain (Plan B):** Ethereum Sepolia — feature flag `NEXT_PUBLIC_BLOCKCHAIN_ENABLED` (Etapa 4, no implementado aún)
 
@@ -21,20 +21,25 @@ src/
 ├── app/
 │   ├── (marketplace)/       # home, categorías, detalle, carrito, checkout, roadmap
 │   ├── (auth)/login|registro/
-│   ├── (dashboard)/{operador,agencia,admin,afiliado,cliente}/
-│   └── api/{checkout,tracking}/
-├── components/{ui,marketplace,layout,dashboard}/
+│   ├── (dashboard)/{operador,agencia,admin,afiliado,cliente}/    # dashboards reales con Recharts
+│   └── api/{checkout,tracking,chat,insights/generate}/
+├── components/{ui,marketplace,layout,dashboard,chatbot}/
 ├── lib/
 │   ├── supabase/{client,server,admin}.ts   # admin.ts = service role, server-only
 │   ├── auth/{roles,guards,actions}.ts
+│   ├── afiliado/actions.ts                 # regenerar codigo, solicitar pago
 │   ├── cart/actions.ts
-│   ├── data/{listings,categorias,cart,orders,detail-href}.ts
+│   ├── ai/provider.ts                      # abstraccion IA (Gemini + mock)
+│   ├── data/{listings,categorias,cart,orders,detail-href,
+│   │         dashboard-operador,dashboard-agencia,dashboard-admin,
+│   │         dashboard-afiliado,dashboard-cliente,recommendations,
+│   │         insights,chatbot-catalogo}.ts
 │   ├── tracking/track.ts
 │   └── pioneer-pay/sandbox.ts
 ├── proxy.ts                 # refresco de sesión + cookie de tracking (Next 16: reemplaza middleware.ts)
 └── config/{site,flags}.ts
 
-supabase/migrations/          # 0001-0010, ver docs/ERD.md
+supabase/migrations/          # 0001-0015, ver docs/ERD.md
 scripts/
 ├── db/migrate.mjs            # aplica migraciones sin Docker (session pooler)
 └── seed/{01_inventory,02_demo_users}.mjs
@@ -44,7 +49,7 @@ Diagrama ER completo y el patrón de RLS (6 plantillas reutilizables en las 18 t
 
 ## Los 5 roles
 
-`operador` · `agencia` · `admin` · `afiliado` · `cliente` — cada uno con dashboard propio (placeholders hasta Etapa 2) protegido por `requireRole()` + RLS. Usuarios demo (mismo password para los 5):
+`operador` · `agencia` · `admin` · `afiliado` · `cliente` — cada uno con dashboard real (Recharts, datos en vivo) protegido por `requireRole()` + RLS. Usuarios demo (mismo password para los 5):
 
 | Rol | Email | Password |
 |---|---|---|
@@ -81,8 +86,8 @@ Esta máquina no tiene Docker/Podman, así que `supabase link`/`db push`/`gen ty
 Ver la página pública [`/roadmap`](http://localhost:3000/roadmap) y el detalle técnico en `CHANGELOG.md`.
 
 1. **Esqueleto** (completa) — auth, esquema BD, seeds, marketplace, checkout sandbox, tracking básico.
-2. **Inteligencia** — dashboards, insights IA, chatbot, afiliados.
-3. **B2B + Data Marketplace** — portal de agencias, paquetes, venta de datos.
+2. **Inteligencia** (completa) — dashboards por rol, insights con Gemini, chatbot concierge, recomendador, módulo de afiliados.
+3. **B2B + Data Marketplace** — portal de agencias, tarifas netas, venta de datos (data_packages).
 4. **Blockchain (Plan B)** — contratos Sepolia, NFT-tickets, escrow, comisiones on-chain.
 5. **Producción** — pasarela real, KYC, multi-idioma/moneda, mainnet, apps móviles.
 

@@ -11,9 +11,9 @@ const ETAPAS = [
   {
     numero: 2,
     nombre: "Inteligencia",
-    estado: "pendiente" as const,
+    estado: "completa" as const,
     descripcion:
-      "Dashboards por rol, motor de insights con IA, chatbot concierge, recomendador y módulo de afiliados completo.",
+      "Dashboards por rol, motor de insights con IA (Gemini), chatbot concierge, recomendador y módulo de afiliados completo.",
   },
   {
     numero: 3,

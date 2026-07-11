@@ -28,14 +28,41 @@ README (arquitectura, ER, roadmap, guía de faucets Sepolia), `/roadmap` públic
 
 ---
 
+## Etapa 2 — Inteligencia (completa)
+
+### Bloque 1 — Dashboard de operador
+Ventas totales, reservas, ticket promedio, ocupación, ventas por día (Recharts), top listings. Fix de RLS: `orden_items`/`ordenes` no tenían política para el dueño del listing vendido (solo para el comprador) — migración `0011`, y esa misma migración causó recursión infinita de políticas, arreglada en `0012` con funciones `SECURITY DEFINER`. Paleta categórica de gráficas (`--chart-1..5` + status) revalidada con `dataviz/validate_palette.js` (la de Etapa 1 fallaba lightness/chroma).
+
+### Bloque 2 — Paquetes comprables + dashboard de agencia
+`carrito_items` ahora soporta paquetes (antes solo listings). Ventas de paquetes, órdenes B2C, top paquetes. RLS de agencia con funciones `SECURITY DEFINER` desde el inicio (sin recursión esta vez).
+
+### Bloque 3 — Dashboard de admin
+Funnel de conversión, ventas por categoría/destino, top afiliados. Sin cambios de RLS (admin ya tenía override completo desde Etapa 1).
+
+### Bloque 4 — Dashboard de afiliado
+Clics, conversiones, tasa de conversión, ventas atribuidas, comisiones (total/pendientes). Nueva política RLS para que el afiliado vea los clics de su código (visitantes anónimos, sin `user_id` propio) vía función `SECURITY DEFINER`.
+
+### Bloque 5 — Dashboard de cliente + recomendador
+Mis viajes (historial real de órdenes). "Para ti": recomendador basado en reglas sobre el tracking del cliente (no usa IA), excluye lo ya visto/comprado.
+
+### Bloque 6 — Motor de insights con IA
+`lib/ai/provider.ts`: capa de abstracción (`generateInsight`/`chat`) con **Gemini** (`@google/genai`, modelo `gemini-flash-latest`) como proveedor actual. `AI_MODE=live|mock` con fallback automático a datos mock si Gemini falla. Insights generados a partir de datos reales agregados (ventas por categoría/destino, funnel, top afiliados), guardados en `ai_insights`, visibles en el dashboard de admin. Sin Docker disponible, se implementó como Route Handler (no Supabase Edge Function real).
+
+### Bloque 7 — Chatbot concierge "Ruta"
+Widget flotante en toda la app. Recibe el catálogo real de listings/paquetes como contexto y solo recomienda de ahí, con links directos verificados. Rechaza honestamente lo que no está en catálogo en vez de inventar.
+
+### Bloque 8 — Módulo de afiliados completo
+Regenerar `codigo_5`/`codigo_10` desde el dashboard, solicitud de pago de comisiones pendientes (`afiliados.pago_solicitado_at`).
+
+---
+
 ## Checklist de criterios de aceptación (sección 9 del spec)
 
 - [x] Repo con estructura de carpetas clara, `.env.example`, migraciones SQL, seeds.
 - [ ] Contratos con tests de Hardhat — **Etapa 4** (Plan B blockchain).
-- [x] Los 5 logins demo funcionan y cada rol ve solo lo suyo (RLS probado — ver Bloque 3/6).
-- [x] Flujo demostrable: cliente busca → aplica código de afiliado 10% → paga en Pioneer sandbox → orden creada → comisión al afiliado → tracking registrado (verificado end-to-end en Bloque 6/7).
-- [ ] Insight aparece en dashboard del admin — **Etapa 2** (motor de insights de IA).
+- [x] Los 5 logins demo funcionan y cada rol ve solo lo suyo (RLS probado — ver Bloque 3/6 Etapa 1 y Bloques 1-4 Etapa 2).
+- [x] Flujo demostrable: cliente busca → aplica código de afiliado 10% → paga en Pioneer sandbox → orden creada → comisión al afiliado → tracking registrado → insight aparece en dashboard del admin (verificado end-to-end).
 - [ ] NFT-ticket en Sepolia con link a Etherscan — **Etapa 4** (Plan B).
-- [ ] Data Marketplace con 3 paquetes de datos con gráficas de preview — **Etapa 2/3** (tabla `data_packages` existe, sin poblar aún).
+- [ ] Data Marketplace con 3 paquetes de datos con gráficas de preview — **Etapa 3** (tabla `data_packages` existe, sin poblar aún).
 - [x] UI con identidad de rutaru.com, eslogan "pocas rutas, todas buenas.", responsive, diseñada con `ui-ux-pro-max`.
 - [x] README con arquitectura, diagrama ER, guía de faucets Sepolia y roadmap por etapas.
