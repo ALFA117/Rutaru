@@ -1,8 +1,10 @@
 import { requireRole } from "@/lib/auth/guards";
 import { getAdminDashboardData } from "@/lib/data/dashboard-admin";
+import { getLatestInsights } from "@/lib/data/insights";
 import { StatTile } from "@/components/dashboard/stat-tile";
 import { TopBarChart } from "@/components/dashboard/top-bar-chart";
 import { ConversionFunnelChart } from "@/components/dashboard/funnel-chart";
+import { InsightsPanel } from "@/components/dashboard/insights-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { logout } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
@@ -15,8 +17,8 @@ const currency = new Intl.NumberFormat("es-MX", {
 
 export default async function AdminPage() {
   await requireRole("admin");
-  const { funnel, categorias, destinos, topAfiliados, totales } =
-    await getAdminDashboardData();
+  const [{ funnel, categorias, destinos, topAfiliados, totales }, insights] =
+    await Promise.all([getAdminDashboardData(), getLatestInsights()]);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
@@ -81,6 +83,17 @@ export default async function AdminPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-heading text-lg">
+            Motor de insights (IA)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InsightsPanel insights={insights} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
