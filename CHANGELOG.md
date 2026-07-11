@@ -87,13 +87,44 @@ Reutiliza `lib/ai/provider.ts` para escribir la descripción comercial de cada p
 
 ---
 
+## Etapa 4 — Blockchain (Plan B) (completa)
+
+Todo detrás del feature flag `NEXT_PUBLIC_BLOCKCHAIN_ENABLED` (`false` por defecto) — con el flag apagado, Etapas 1-3 funcionan exactamente igual (verificado con regresión completa: 5 logins, compra Pioneer sandbox real vía `/api/checkout`, dashboards).
+
+### Bloque 1 — Setup Hardhat + wagmi/RainbowKit
+Sub-proyecto `/contracts` (Hardhat 3, `@nomicfoundation/hardhat-toolbox-mocha-ethers`, OpenZeppelin 5.6.1) con su propio `package.json`, separado del build de Next.js. `tsconfig.json` raíz excluye `/contracts` (su toolchain no está instalado en el build de Next — causó el primer fallo de deploy en Vercel, corregido). `npm run fund:check` verifica balance de la wallet de deploy sin exponerla en logs.
+
+### Bloques 2-4 — Los 3 contratos (Solidity `^0.8.28`, OpenZeppelin `Ownable`)
+- **`RutaruTicket`** (ERC-721): `mintTicket(to, folio, metadataURI)` — solo el backend (owner) acuña, metadata en data-URI base64. `tokenURI` de lectura pública para `/verificar/[tokenId]`.
+- **`RutaruBooking`** (escrow): `crearReserva(operador, folio)` la llama el cliente desde su propia wallet (MetaMask) reteniendo el ETH en el contrato; `completarServicio(id)`/`cancelarReserva(id)` solo el backend, liberan al operador o reembolsan al comprador. El `folio` liga la reserva on-chain con la orden en Supabase.
+- **`RutaruAffiliate`**: `pagarComision(afiliado, folio)` — el backend reenvía la comisión ya calculada a la wallet del afiliado, con evento `ComisionPagada` como comprobante.
+- 19 tests de Hardhat (mint, tokenURI, escrow crear/completar/cancelar con verificación real de balances, comisión, y rechazo a quien no es el owner en los 3 contratos).
+- Desplegados a **Sepolia real**: ver direcciones y links de Etherscan al final de este changelog.
+
+### Bloque 5 — Consentimiento anclado on-chain
+Migración `0021`: `profiles.consentimiento_hash`/`consentimiento_tx_hash`. El backend calcula `keccak256(userId + texto + timestamp)` y lo ancla con una transacción de valor cero, visible en `/cliente` con link a Etherscan.
+
+### Bloque 6 — Conexión de wallet
+`wagmi@^2.19` + `@rainbow-me/rainbowkit@^2.2.11` (RainbowKit 2.x no soporta wagmi 3.x). `BlockchainProviders` envuelve la app solo cuando el flag está encendido — la config de wagmi (`getWagmiConfig()`) es perezosa para que Plan A nunca dependa de `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`. Botón "Conectar wallet" en el navbar, solo visible con el flag activo.
+
+### Bloque 7 — Checkout con cripto
+`/checkout` gana la opción "Pagar con cripto (testnet)" (solo con el flag activo). El cliente firma `crearReserva` con su wallet; `api/checkout/crypto` verifica la transacción on-chain (lee el evento `ReservaCreada`), crea la orden con `estado='confirmada'` (distinto de `'pagada'` del sandbox), acuña el NFT-ticket y, si había código de afiliado, paga la comisión on-chain. Confirmación y "mis viajes" muestran links de Etherscan y a `/verificar/[tokenId]`.
+
+### Bloque 8 — Escrow y comisiones desde los dashboards
+Migración `0021` (`afiliados`/`operadores.wallet_address`) y `0023` (`ordenes.reserva_id_blockchain`, liga la orden con la reserva on-chain para poder liberarla/cancelarla). Dashboard de operador: reservas blockchain pendientes con botones "Marcar completado"/"Cancelar y reembolsar" (verifica que la orden pertenezca al operador antes de tocar el contrato). Afiliado y operador pueden configurar su wallet de recepción.
+
+### Bloque 9 — Verificación pública + cierre
+`/verificar/[tokenId]`: lee `ownerOf`/`tokenURI` directo del contrato (lectura pública, sin llave privada) + QR de verificación. Migración `0022`: lectura pública de `nft_tickets` (ya son públicos por naturaleza, cualquiera puede consultarlos en Etherscan). Smoke test end-to-end en Sepolia real (crearReserva → mintTicket con verificación de lectura pública → completarServicio → pagarComision), 4 transacciones confirmadas — links en el resumen del cierre.
+
+---
+
 ## Checklist de criterios de aceptación (sección 9 del spec)
 
 - [x] Repo con estructura de carpetas clara, `.env.example`, migraciones SQL, seeds.
-- [ ] Contratos con tests de Hardhat — **Etapa 4** (Plan B blockchain).
+- [x] Contratos con tests de Hardhat — 19 tests, ver Etapa 4 Bloques 2-4.
 - [x] Los 5 logins demo funcionan y cada rol ve solo lo suyo (RLS probado en las 3 etapas, incluida la tarifa neta B2B en Etapa 3).
 - [x] Flujo demostrable: cliente busca → aplica código de afiliado 10% → paga en Pioneer sandbox → orden creada → comisión al afiliado → tracking registrado → insight aparece en dashboard del admin (verificado end-to-end).
-- [ ] NFT-ticket en Sepolia con link a Etherscan — **Etapa 4** (Plan B).
+- [x] NFT-ticket en Sepolia con link a Etherscan — ver Etapa 4 Bloque 9, smoke test con tx reales.
 - [x] Data Marketplace con 3+ paquetes de datos con gráficas de preview — 4 paquetes reales en `/datos`, con export CSV/JSON y resumen ejecutivo con IA.
 - [x] UI con identidad de rutaru.com, eslogan "pocas rutas, todas buenas.", responsive, diseñada con `ui-ux-pro-max`.
 - [x] README con arquitectura, diagrama ER, guía de faucets Sepolia y roadmap por etapas.

@@ -25,9 +25,9 @@ const ETAPAS = [
   {
     numero: 4,
     nombre: "Blockchain (Plan B)",
-    estado: "pendiente" as const,
+    estado: "completa" as const,
     descripcion:
-      "Contratos en Ethereum Sepolia, NFT-tickets, escrow de pagos, comisiones on-chain y registro de consentimiento de datos.",
+      "3 contratos desplegados en Ethereum Sepolia real: RutaruTicket (NFT-ticket con QR verificable en /verificar), RutaruBooking (escrow con liberación/reembolso) y RutaruAffiliate (comisión automática). Conexión de wallet (RainbowKit), checkout con 'Pagar con cripto (testnet)', consentimiento de datos anclado on-chain. Todo detrás del feature flag NEXT_PUBLIC_BLOCKCHAIN_ENABLED — apagado por defecto, la Etapa 1-3 funciona idéntica sin blockchain.",
   },
   {
     numero: 5,
