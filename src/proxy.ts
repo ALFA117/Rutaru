@@ -31,8 +31,13 @@ export async function proxy(request: NextRequest) {
   await supabase.auth.getUser();
 
   // session_id estable para events_tracking, incluso para visitantes anonimos.
+  // Se muta tanto `request` como `response` (mismo patron que arriba) para que
+  // Route Handlers (no solo paginas) vean la cookie en la misma request.
   if (!request.cookies.get("rutaru_sid")) {
-    response.cookies.set("rutaru_sid", crypto.randomUUID(), {
+    const sid = crypto.randomUUID();
+    request.cookies.set("rutaru_sid", sid);
+    response = NextResponse.next({ request });
+    response.cookies.set("rutaru_sid", sid, {
       maxAge: 60 * 60 * 24 * 365,
       path: "/",
       sameSite: "lax",
