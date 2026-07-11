@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCartItems, clearCart } from "@/lib/data/cart";
 import { chargeSandbox, type MetodoPago } from "@/lib/pioneer-pay/sandbox";
+import { track } from "@/lib/tracking/track";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
       afiliadoId = afiliado.id;
       afiliadoComisionPct = afiliado.comision_pct;
       descuentoPct = afiliado.codigo_10 === codigoAfiliado ? 10 : 5;
+      await track({ tipoEvento: "code_applied", entidad: codigoAfiliado });
     }
   }
 
@@ -111,6 +113,12 @@ export async function POST(request: Request) {
   }
 
   await clearCart(user.id);
+
+  await track({
+    tipoEvento: "purchase",
+    entidad: orden.id,
+    metadata: { total, tipo: "b2c" },
+  });
 
   return NextResponse.json({ ordenId: orden.id });
 }

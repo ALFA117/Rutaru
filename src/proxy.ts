@@ -30,6 +30,15 @@ export async function proxy(request: NextRequest) {
   // Touches the session so expiring tokens get refreshed before rendering.
   await supabase.auth.getUser();
 
+  // session_id estable para events_tracking, incluso para visitantes anonimos.
+  if (!request.cookies.get("rutaru_sid")) {
+    response.cookies.set("rutaru_sid", crypto.randomUUID(), {
+      maxAge: 60 * 60 * 24 * 365,
+      path: "/",
+      sameSite: "lax",
+    });
+  }
+
   return response;
 }
 

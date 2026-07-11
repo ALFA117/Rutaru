@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { track } from "@/lib/tracking/track";
 
 export async function GET(
   request: NextRequest,
@@ -25,6 +26,8 @@ export async function GET(
       sameSite: "lax",
     });
   }
+
+  await track({ tipoEvento: "click", entidad: codigo, metadata: { valido: !!afiliado } });
 
   return response;
 }

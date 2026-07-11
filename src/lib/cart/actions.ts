@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { addToCart, removeFromCart } from "@/lib/data/cart";
+import { track } from "@/lib/tracking/track";
 
 export async function addToCartAction(formData: FormData) {
   const listingId = String(formData.get("listingId") ?? "");
@@ -15,6 +16,7 @@ export async function addToCartAction(formData: FormData) {
   if (!user) redirect("/login");
 
   await addToCart(user.id, listingId);
+  await track({ tipoEvento: "add_to_cart", entidad: listingId });
   revalidatePath("/carrito");
   redirect("/carrito");
 }

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { ListingCard } from "@/components/marketplace/listing-card";
 import { FiltersBar } from "@/components/marketplace/filters-bar";
 import { getListingsByTipo, type ListingTipo } from "@/lib/data/listings";
+import { track } from "@/lib/tracking/track";
 
 export async function CategoryPage({
   tipo,
@@ -19,6 +20,14 @@ export async function CategoryPage({
     destino: params.destino,
     orden: params.orden as "precio_asc" | "precio_desc" | undefined,
   });
+
+  if (params.destino) {
+    await track({
+      tipoEvento: "search",
+      entidad: tipo,
+      metadata: { destino: params.destino, orden: params.orden },
+    });
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12">

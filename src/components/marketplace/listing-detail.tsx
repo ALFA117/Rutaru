@@ -10,6 +10,7 @@ import {
 import type { Listing } from "@/lib/data/listings";
 import type { Database } from "@/types/database.types";
 import { addToCartAction } from "@/lib/cart/actions";
+import { track } from "@/lib/tracking/track";
 
 type Disponibilidad = Database["public"]["Tables"]["disponibilidad"]["Row"];
 type Resena = Database["public"]["Tables"]["resenas"]["Row"];
@@ -27,7 +28,7 @@ const fecha = new Intl.DateTimeFormat("es-MX", {
 
 type Zona = { nombre: string; precio: number };
 
-export function ListingDetail({
+export async function ListingDetail({
   listing,
   disponibilidad,
   resenas,
@@ -36,6 +37,12 @@ export function ListingDetail({
   disponibilidad: Disponibilidad[];
   resenas: Resena[];
 }) {
+  await track({
+    tipoEvento: "page_view",
+    entidad: listing.slug,
+    metadata: { tipo: listing.tipo },
+  });
+
   const zonas = (listing.itinerario as Array<{ zonas?: Zona[] }> | null)?.[0]
     ?.zonas;
 
