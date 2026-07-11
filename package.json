@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:migrate": "node scripts/db/migrate.mjs",
     "seed:demo-users": "node scripts/seed/02_demo_users.mjs",
-    "seed:inventory": "node scripts/seed/01_inventory.mjs"
+    "seed:inventory": "node scripts/seed/01_inventory.mjs",
+    "seed:data-packages": "node scripts/seed/03_data_packages.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.11.0",
