@@ -27,7 +27,7 @@ export async function getCartItems(userId: string) {
 
   const { data, error } = await supabase
     .from("carrito_items")
-    .select("*, listings(*), paquetes(*)")
+    .select("*, listings(*, operadores(wallet_address)), paquetes(*)")
     .eq("carrito_id", carritoId)
     .order("created_at", { ascending: true });
   if (error) throw error;

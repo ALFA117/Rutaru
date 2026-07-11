@@ -1,11 +1,21 @@
 import { requireRole } from "@/lib/auth/guards";
 import { getOperadorDashboardData } from "@/lib/data/dashboard-operador";
+import { getReservasBlockchainPendientes } from "@/lib/data/dashboard-operador-blockchain";
 import { StatTile } from "@/components/dashboard/stat-tile";
 import { SalesAreaChart } from "@/components/dashboard/sales-area-chart";
 import { TopBarChart } from "@/components/dashboard/top-bar-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { logout } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { BLOCKCHAIN_ENABLED } from "@/config/flags";
+import { etherscanTxUrl } from "@/lib/blockchain/config";
+import {
+  actualizarWalletOperadorAction,
+  completarServicioAction,
+  cancelarReservaAction,
+} from "@/lib/blockchain/dashboard-actions";
 
 const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -34,7 +44,10 @@ export default async function OperadorPage() {
     );
   }
 
-  const { totales, ventas, topListings, listings } = data;
+  const { operador, totales, ventas, topListings, listings } = data;
+  const reservasBlockchain = BLOCKCHAIN_ENABLED
+    ? await getReservasBlockchainPendientes(operador.id)
+    : [];
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
@@ -98,6 +111,79 @@ export default async function OperadorPage() {
           </ul>
         </CardContent>
       </Card>
+
+      {BLOCKCHAIN_ENABLED && (
+        <>
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle className="font-heading text-lg">
+                Reservas blockchain pendientes ({reservasBlockchain.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {reservasBlockchain.length === 0 ? (
+                <p className="py-4 text-sm text-muted-foreground">
+                  No hay reservas en escrow esperando confirmación.
+                </p>
+              ) : (
+                <ul className="flex flex-col divide-y divide-border">
+                  {reservasBlockchain.map((r) => (
+                    <li key={r.ordenId} className="flex flex-col gap-2 py-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-sm">{r.listings.join(", ")}</span>
+                        <a
+                          href={etherscanTxUrl(r.txHash)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs underline text-muted-foreground"
+                        >
+                          Ver pago en Etherscan ↗
+                        </a>
+                      </div>
+                      <div className="flex gap-2">
+                        <form action={completarServicioAction}>
+                          <input type="hidden" name="ordenId" value={r.ordenId} />
+                          <Button type="submit" size="sm">
+                            Marcar completado
+                          </Button>
+                        </form>
+                        <form action={cancelarReservaAction}>
+                          <input type="hidden" name="ordenId" value={r.ordenId} />
+                          <Button type="submit" size="sm" variant="outline">
+                            Cancelar y reembolsar
+                          </Button>
+                        </form>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="mt-8 max-w-md">
+            <CardHeader>
+              <CardTitle className="font-heading text-lg">
+                Wallet para recibir pagos on-chain
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form action={actualizarWalletOperadorAction} className="flex flex-col gap-2">
+                <Label htmlFor="walletAddress">Dirección de wallet (Sepolia)</Label>
+                <Input
+                  id="walletAddress"
+                  name="walletAddress"
+                  placeholder="0x…"
+                  defaultValue={operador.wallet_address ?? ""}
+                />
+                <Button type="submit" size="sm" variant="outline" className="mt-1 w-fit">
+                  Guardar
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

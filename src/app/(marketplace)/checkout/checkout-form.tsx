@@ -11,11 +11,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { BLOCKCHAIN_ENABLED } from "@/config/flags";
+import { CryptoCheckoutPanel } from "./crypto-checkout-panel";
 
-export function CheckoutForm() {
+export function CheckoutForm({ operadorWallet }: { operadorWallet: string }) {
   const router = useRouter();
   const [codigoAfiliado, setCodigoAfiliado] = useState("");
   const [metodoPago, setMetodoPago] = useState("tarjeta");
+  const [gateway, setGateway] = useState<"pioneer" | "cripto">("pioneer");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +44,7 @@ export function CheckoutForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <Label htmlFor="codigo">Código de afiliado (opcional)</Label>
         <Input
@@ -52,35 +55,50 @@ export function CheckoutForm() {
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label>Método de pago — Pioneer Pay (sandbox)</Label>
-        <Tabs value={metodoPago} onValueChange={setMetodoPago}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="tarjeta">Tarjeta</TabsTrigger>
-            <TabsTrigger value="spei">SPEI</TabsTrigger>
-            <TabsTrigger value="wallet">Wallet</TabsTrigger>
+      {BLOCKCHAIN_ENABLED && (
+        <Tabs value={gateway} onValueChange={(v) => setGateway(v as "pioneer" | "cripto")}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="pioneer">Pioneer Pay (sandbox)</TabsTrigger>
+            <TabsTrigger value="cripto">Pagar con cripto (testnet)</TabsTrigger>
           </TabsList>
-          <TabsContent value="tarjeta" className="text-sm text-muted-foreground">
-            Simulación de pago con tarjeta — sandbox, sin datos reales.
-          </TabsContent>
-          <TabsContent value="spei" className="text-sm text-muted-foreground">
-            Simulación de transferencia SPEI — sandbox, sin datos reales.
-          </TabsContent>
-          <TabsContent value="wallet" className="text-sm text-muted-foreground">
-            Simulación de pago con wallet — sandbox, sin datos reales.
-          </TabsContent>
         </Tabs>
-      </div>
-
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
       )}
 
-      <Button type="submit" size="lg" disabled={loading}>
-        {loading ? "Procesando…" : "Pagar"}
-      </Button>
-    </form>
+      {gateway === "cripto" ? (
+        <CryptoCheckoutPanel operadorWallet={operadorWallet} codigoAfiliado={codigoAfiliado} />
+      ) : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <Label>Método de pago — Pioneer Pay (sandbox)</Label>
+            <Tabs value={metodoPago} onValueChange={setMetodoPago}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="tarjeta">Tarjeta</TabsTrigger>
+                <TabsTrigger value="spei">SPEI</TabsTrigger>
+                <TabsTrigger value="wallet">Wallet</TabsTrigger>
+              </TabsList>
+              <TabsContent value="tarjeta" className="text-sm text-muted-foreground">
+                Simulación de pago con tarjeta — sandbox, sin datos reales.
+              </TabsContent>
+              <TabsContent value="spei" className="text-sm text-muted-foreground">
+                Simulación de transferencia SPEI — sandbox, sin datos reales.
+              </TabsContent>
+              <TabsContent value="wallet" className="text-sm text-muted-foreground">
+                Simulación de pago con wallet — sandbox, sin datos reales.
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
+
+          <Button type="submit" size="lg" disabled={loading}>
+            {loading ? "Procesando…" : "Pagar"}
+          </Button>
+        </form>
+      )}
+    </div>
   );
 }

@@ -8,8 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { logout } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { actualizarConsentimientoAction } from "@/lib/perfil/actions";
+import {
+  actualizarConsentimientoAction,
+  anclarConsentimientoAction,
+} from "@/lib/perfil/actions";
 import type { ListingTipo } from "@/lib/data/listings";
+import { BLOCKCHAIN_ENABLED } from "@/config/flags";
+import { etherscanTokenUrl, etherscanTxUrl } from "@/lib/blockchain/config";
 
 const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -77,11 +82,36 @@ export default async function ClientePage() {
                   </div>
                   <ul className="text-sm text-muted-foreground">
                     {orden.orden_items?.map((item) => (
-                      <li key={item.id}>
-                        {item.listings?.titulo ?? item.paquetes?.titulo} × {item.cantidad}
+                      <li key={item.id} className="flex flex-wrap items-center gap-2">
+                        <span>
+                          {item.listings?.titulo ?? item.paquetes?.titulo} × {item.cantidad}
+                        </span>
+                        {item.nft_tickets?.[0] && (
+                          <a
+                            href={etherscanTokenUrl(
+                              item.nft_tickets[0].contract_address ?? "",
+                              item.nft_tickets[0].token_id ?? 0
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs underline"
+                          >
+                            NFT-ticket en Etherscan ↗
+                          </a>
+                        )}
                       </li>
                     ))}
                   </ul>
+                  {orden.tx_hash_blockchain && (
+                    <a
+                      href={etherscanTxUrl(orden.tx_hash_blockchain)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs underline text-muted-foreground"
+                    >
+                      Ver pago en Etherscan ↗
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -126,6 +156,32 @@ export default async function ClientePage() {
               Guardar preferencia
             </Button>
           </form>
+
+          {BLOCKCHAIN_ENABLED && (
+            <div className="mt-6 border-t border-border pt-4">
+              <p className="text-sm font-medium">Consentimiento anclado on-chain</p>
+              {profile.consentimiento_tx_hash ? (
+                <a
+                  href={etherscanTxUrl(profile.consentimiento_tx_hash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-block text-sm underline"
+                >
+                  Ver transacción en Etherscan ↗
+                </a>
+              ) : (
+                <form action={anclarConsentimientoAction}>
+                  <p className="mb-2 mt-1 text-sm text-muted-foreground">
+                    Ancla un hash de tu preferencia de consentimiento en Sepolia,
+                    verificable públicamente.
+                  </p>
+                  <Button type="submit" size="sm" variant="outline">
+                    Anclar en blockchain (testnet)
+                  </Button>
+                </form>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

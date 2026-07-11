@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCartItems, cartItemPrice, cartItemTitle } from "@/lib/data/cart";
 import { CheckoutForm } from "./checkout-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FALLBACK_WALLET } from "@/lib/blockchain/config";
 
 const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -32,11 +33,16 @@ export default async function CheckoutPage() {
     0
   );
 
+  // Simplificacion de demo: el escrow on-chain solo soporta una wallet
+  // receptora por reserva, asi que se usa el operador del primer item del
+  // carrito (o la wallet del backend si el operador no configuro la suya).
+  const operadorWallet = items[0]?.listings?.operadores?.wallet_address ?? FALLBACK_WALLET;
+
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-8 px-4 py-12 md:grid-cols-2">
       <div>
         <h1 className="mb-6 font-heading text-3xl">Checkout</h1>
-        <CheckoutForm />
+        <CheckoutForm operadorWallet={operadorWallet} />
       </div>
 
       <Card className="h-fit">

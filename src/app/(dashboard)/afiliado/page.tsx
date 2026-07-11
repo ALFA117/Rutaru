@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { logout } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 import { regenerarCodigoAction, solicitarPagoAction } from "@/lib/afiliado/actions";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { BLOCKCHAIN_ENABLED } from "@/config/flags";
+import { actualizarWalletAfiliadoAction } from "@/lib/blockchain/dashboard-actions";
 
 const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -131,6 +135,30 @@ export default async function AfiliadoPage() {
           </CardContent>
         </Card>
       </div>
+
+      {BLOCKCHAIN_ENABLED && (
+        <Card className="mt-8 max-w-md">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg">
+              Wallet para comisiones on-chain
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form action={actualizarWalletAfiliadoAction} className="flex flex-col gap-2">
+              <Label htmlFor="walletAddress">Dirección de wallet (Sepolia)</Label>
+              <Input
+                id="walletAddress"
+                name="walletAddress"
+                placeholder="0x…"
+                defaultValue={afiliado.wallet_address ?? ""}
+              />
+              <Button type="submit" size="sm" variant="outline" className="mt-1 w-fit">
+                Guardar
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

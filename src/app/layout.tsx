@@ -3,6 +3,8 @@ import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { RutaChatbot } from "@/components/chatbot/ruta-chatbot";
+import { BlockchainProviders } from "@/components/blockchain/blockchain-providers";
+import { BLOCKCHAIN_ENABLED } from "@/config/flags";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -40,10 +42,21 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <SiteHeader />
-        <main className="flex flex-1 flex-col">{children}</main>
-        <SiteFooter />
-        <RutaChatbot />
+        {BLOCKCHAIN_ENABLED ? (
+          <BlockchainProviders>
+            <SiteHeader />
+            <main className="flex flex-1 flex-col">{children}</main>
+            <SiteFooter />
+            <RutaChatbot />
+          </BlockchainProviders>
+        ) : (
+          <>
+            <SiteHeader />
+            <main className="flex flex-1 flex-col">{children}</main>
+            <SiteFooter />
+            <RutaChatbot />
+          </>
+        )}
       </body>
     </html>
   );

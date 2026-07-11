@@ -5,7 +5,7 @@ export async function getOrdenConDetalle(ordenId: string) {
 
   const { data: orden, error } = await supabase
     .from("ordenes")
-    .select("*, orden_items(*, listings(titulo)), pagos(*)")
+    .select("*, orden_items(*, listings(titulo), nft_tickets(*)), pagos(*)")
     .eq("id", ordenId)
     .maybeSingle();
   if (error) throw error;

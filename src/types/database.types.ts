@@ -26,6 +26,8 @@ export type Database = {
           ciudad: string | null;
           verificado: boolean;
           consiente_datos_agregados: boolean;
+          consentimiento_hash: string | null;
+          consentimiento_tx_hash: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,6 +43,8 @@ export type Database = {
           ciudad?: string | null;
           verificado?: boolean;
           consiente_datos_agregados?: boolean;
+          consentimiento_hash?: string | null;
+          consentimiento_tx_hash?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -55,6 +59,7 @@ export type Database = {
           descripcion: string | null;
           logo: string | null;
           slug: string;
+          wallet_address: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -65,6 +70,7 @@ export type Database = {
           descripcion?: string | null;
           logo?: string | null;
           slug: string;
+          wallet_address?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -118,6 +124,7 @@ export type Database = {
           comision_pct: number;
           saldo: number;
           pago_solicitado_at: string | null;
+          wallet_address: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -129,6 +136,7 @@ export type Database = {
           comision_pct?: number;
           saldo?: number;
           pago_solicitado_at?: string | null;
+          wallet_address?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -333,6 +341,7 @@ export type Database = {
           estado: Database["public"]["Enums"]["orden_estado"];
           metodo_pago: string | null;
           tx_hash_blockchain: string | null;
+          reserva_id_blockchain: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -347,6 +356,7 @@ export type Database = {
           estado?: Database["public"]["Enums"]["orden_estado"];
           metodo_pago?: string | null;
           tx_hash_blockchain?: string | null;
+          reserva_id_blockchain?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -441,6 +451,7 @@ export type Database = {
           orden_id: string;
           monto: number;
           estado: Database["public"]["Enums"]["comision_estado"];
+          tx_hash: string | null;
           created_at: string;
         };
         Insert: {
@@ -449,6 +460,7 @@ export type Database = {
           orden_id: string;
           monto: number;
           estado?: Database["public"]["Enums"]["comision_estado"];
+          tx_hash?: string | null;
           created_at?: string;
         };
         Update: Partial<

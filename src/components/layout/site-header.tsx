@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { ROLE_HOME } from "@/lib/auth/roles";
 import { Button } from "@/components/ui/button";
 import { CATEGORIAS } from "@/lib/data/categorias";
+import { BLOCKCHAIN_ENABLED } from "@/config/flags";
+import { ConnectWalletButton } from "@/components/blockchain/connect-wallet-button";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -39,9 +41,12 @@ export async function SiteHeader() {
           ))}
         </nav>
 
-        <Button asChild size="sm">
-          <Link href={accountHref}>{user ? "Mi cuenta" : "Iniciar sesión"}</Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          {BLOCKCHAIN_ENABLED && <ConnectWalletButton />}
+          <Button asChild size="sm">
+            <Link href={accountHref}>{user ? "Mi cuenta" : "Iniciar sesión"}</Link>
+          </Button>
+        </div>
       </div>
     </header>
   );
