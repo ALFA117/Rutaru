@@ -621,7 +621,38 @@ export type Database = {
         ];
       };
     };
-    Views: Record<string, never>;
+    Views: {
+      listings_publico: {
+        Row: {
+          id: string;
+          operador_id: string;
+          tipo: Database["public"]["Enums"]["listing_tipo"];
+          titulo: string;
+          slug: string;
+          descripcion: string | null;
+          itinerario: Json;
+          precio_b2c: number;
+          moneda: string;
+          duracion: string | null;
+          ubicacion: string | null;
+          lat: number | null;
+          lng: number | null;
+          imagenes: string[];
+          cupo: number | null;
+          activo: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "listings_operador_id_fkey";
+            columns: ["operador_id"];
+            referencedRelation: "operadores";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+    };
     Functions: {
       get_user_role: {
         Args: { user_id: string };

@@ -11,9 +11,8 @@ export async function buildCatalogoContext() {
 
   const [{ data: listings }, { data: paquetes }] = await Promise.all([
     supabase
-      .from("listings")
-      .select("titulo, tipo, slug, precio_b2c, ubicacion, duracion")
-      .eq("activo", true),
+      .from("listings_publico")
+      .select("titulo, tipo, slug, precio_b2c, ubicacion, duracion"),
     supabase.from("paquetes").select("titulo, precio_total"),
   ]);
 

@@ -20,7 +20,7 @@ export async function getParaTiListings(userId: string, limit = 6) {
   }
 
   const { data: listingsVistos } = await supabase
-    .from("listings")
+    .from("listings_publico")
     .select("id, tipo, ubicacion")
     .in("slug", slugsVistos);
 
@@ -45,10 +45,9 @@ export async function getParaTiListings(userId: string, limit = 6) {
   }
 
   const { data: recomendados } = await supabase
-    .from("listings")
+    .from("listings_publico")
     .select("*")
     .eq("tipo", tipoPreferido)
-    .eq("activo", true)
     .not(
       "id",
       "in",

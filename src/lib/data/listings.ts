@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 
-export type Listing = Database["public"]["Tables"]["listings"]["Row"];
+// Los datos publicos vienen de la vista listings_publico (sin precio_neto_b2b).
+export type Listing = Database["public"]["Views"]["listings_publico"]["Row"];
 export type ListingTipo = Database["public"]["Enums"]["listing_tipo"];
 
 export type ListingFilters = {
@@ -15,10 +16,9 @@ export async function getListingsByTipo(
 ) {
   const supabase = await createClient();
   let query = supabase
-    .from("listings")
+    .from("listings_publico")
     .select("*")
-    .eq("tipo", tipo)
-    .eq("activo", true);
+    .eq("tipo", tipo);
 
   if (filters.destino) {
     query = query.ilike("ubicacion", `%${filters.destino}%`);
@@ -40,10 +40,9 @@ export async function getListingsByTipo(
 export async function getListingBySlug(slug: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("listings")
+    .from("listings_publico")
     .select("*, operadores(*)")
     .eq("slug", slug)
-    .eq("activo", true)
     .maybeSingle();
   if (error) throw error;
   return data;
@@ -52,9 +51,8 @@ export async function getListingBySlug(slug: string) {
 export async function getFeaturedListings(limit = 6) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("listings")
+    .from("listings_publico")
     .select("*")
-    .eq("activo", true)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
@@ -96,10 +94,9 @@ export async function getOperadorBySlug(slug: string) {
   if (!operador) return null;
 
   const { data: listings, error: listingsError } = await supabase
-    .from("listings")
+    .from("listings_publico")
     .select("*")
-    .eq("operador_id", operador.id)
-    .eq("activo", true);
+    .eq("operador_id", operador.id);
   if (listingsError) throw listingsError;
 
   return { operador, listings };

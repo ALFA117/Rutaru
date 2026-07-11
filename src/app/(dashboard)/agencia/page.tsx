@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/auth/guards";
 import { getAgenciaDashboardData } from "@/lib/data/dashboard-agencia";
 import { StatTile } from "@/components/dashboard/stat-tile";
@@ -40,11 +41,16 @@ export default async function AgenciaPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="font-heading text-3xl">Dashboard de agencia</h1>
-        <form action={logout}>
-          <Button variant="outline" size="sm" type="submit">
-            Cerrar sesión
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/agencia/catalogo">Catálogo B2B</Link>
           </Button>
-        </form>
+          <form action={logout}>
+            <Button variant="outline" size="sm" type="submit">
+              Cerrar sesión
+            </Button>
+          </form>
+        </div>
       </div>
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-3">
