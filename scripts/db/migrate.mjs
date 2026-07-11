@@ -22,15 +22,40 @@ const files = readdirSync(migrationsDir)
   .sort();
 
 await client.connect();
-console.log(`Conectado. Aplicando ${files.length} migraciones...`);
 
-for (const file of files) {
+// Registro simple de migraciones aplicadas para que este script sea
+// incremental (sin Docker no hay `supabase migration list`/history propia).
+await client.query(`
+  create table if not exists public._migrations_applied (
+    filename text primary key,
+    applied_at timestamptz not null default now()
+  );
+`);
+
+const { rows } = await client.query(
+  "select filename from public._migrations_applied"
+);
+const applied = new Set(rows.map((r) => r.filename));
+
+const pending = files.filter((f) => !applied.has(f));
+console.log(
+  `Conectado. ${files.length} migraciones totales, ${pending.length} pendientes.`
+);
+
+for (const file of pending) {
   const sql = readFileSync(join(migrationsDir, file), "utf8");
   process.stdout.write(`-> ${file} ... `);
   try {
+    await client.query("begin");
     await client.query(sql);
+    await client.query(
+      "insert into public._migrations_applied (filename) values ($1)",
+      [file]
+    );
+    await client.query("commit");
     console.log("OK");
   } catch (err) {
+    await client.query("rollback");
     console.log("ERROR");
     console.error(err.message);
     await client.end();
@@ -39,4 +64,4 @@ for (const file of files) {
 }
 
 await client.end();
-console.log("Todas las migraciones aplicadas.");
+console.log("Migraciones al día.");
