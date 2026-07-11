@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCartItems } from "@/lib/data/cart";
+import { getCartItems, cartItemPrice, cartItemTitle } from "@/lib/data/cart";
 import { CheckoutForm } from "./checkout-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -21,7 +21,7 @@ export default async function CheckoutPage() {
   if (items.length === 0) redirect("/carrito");
 
   const subtotal = items.reduce(
-    (acc, item) => acc + item.cantidad * (item.listings?.precio_b2c ?? 0),
+    (acc, item) => acc + item.cantidad * cartItemPrice(item),
     0
   );
 
@@ -40,10 +40,10 @@ export default async function CheckoutPage() {
           {items.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
               <span>
-                {item.listings?.titulo} × {item.cantidad}
+                {cartItemTitle(item)} × {item.cantidad}
               </span>
               <span className="tabular-nums">
-                {currency.format(item.cantidad * (item.listings?.precio_b2c ?? 0))}
+                {currency.format(item.cantidad * cartItemPrice(item))}
               </span>
             </div>
           ))}

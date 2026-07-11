@@ -278,14 +278,16 @@ export type Database = {
         Row: {
           id: string;
           carrito_id: string;
-          listing_id: string;
+          listing_id: string | null;
+          paquete_id: string | null;
           cantidad: number;
           created_at: string;
         };
         Insert: {
           id?: string;
           carrito_id: string;
-          listing_id: string;
+          listing_id?: string | null;
+          paquete_id?: string | null;
           cantidad?: number;
           created_at?: string;
         };
@@ -303,6 +305,12 @@ export type Database = {
             foreignKeyName: "carrito_items_listing_id_fkey";
             columns: ["listing_id"];
             referencedRelation: "listings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "carrito_items_paquete_id_fkey";
+            columns: ["paquete_id"];
+            referencedRelation: "paquetes";
             referencedColumns: ["id"];
           },
         ];

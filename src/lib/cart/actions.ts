@@ -7,7 +7,8 @@ import { addToCart, removeFromCart } from "@/lib/data/cart";
 import { track } from "@/lib/tracking/track";
 
 export async function addToCartAction(formData: FormData) {
-  const listingId = String(formData.get("listingId") ?? "");
+  const listingId = formData.get("listingId");
+  const paqueteId = formData.get("paqueteId");
   const supabase = await createClient();
   const {
     data: { user },
@@ -15,8 +16,14 @@ export async function addToCartAction(formData: FormData) {
 
   if (!user) redirect("/login");
 
-  await addToCart(user.id, listingId);
-  await track({ tipoEvento: "add_to_cart", entidad: listingId });
+  if (paqueteId) {
+    await addToCart(user.id, { paqueteId: String(paqueteId) });
+    await track({ tipoEvento: "add_to_cart", entidad: String(paqueteId) });
+  } else {
+    await addToCart(user.id, { listingId: String(listingId) });
+    await track({ tipoEvento: "add_to_cart", entidad: String(listingId) });
+  }
+
   revalidatePath("/carrito");
   redirect("/carrito");
 }

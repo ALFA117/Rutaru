@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getCartItems, clearCart } from "@/lib/data/cart";
+import { getCartItems, clearCart, cartItemPrice } from "@/lib/data/cart";
 import { chargeSandbox, type MetodoPago } from "@/lib/pioneer-pay/sandbox";
 import { track } from "@/lib/tracking/track";
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   const subtotal = items.reduce(
-    (acc, item) => acc + item.cantidad * (item.listings?.precio_b2c ?? 0),
+    (acc, item) => acc + item.cantidad * cartItemPrice(item),
     0
   );
 
@@ -81,8 +81,9 @@ export async function POST(request: Request) {
   const ordenItems = items.map((item) => ({
     orden_id: orden.id,
     listing_id: item.listing_id,
+    paquete_id: item.paquete_id,
     cantidad: item.cantidad,
-    precio: item.listings?.precio_b2c ?? 0,
+    precio: cartItemPrice(item),
   }));
 
   const { error: itemsError } = await supabase

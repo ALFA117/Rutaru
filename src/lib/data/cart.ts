@@ -27,22 +27,41 @@ export async function getCartItems(userId: string) {
 
   const { data, error } = await supabase
     .from("carrito_items")
-    .select("*, listings(*)")
+    .select("*, listings(*), paquetes(*)")
     .eq("carrito_id", carritoId)
     .order("created_at", { ascending: true });
   if (error) throw error;
   return data;
 }
 
-export async function addToCart(userId: string, listingId: string) {
+export function cartItemPrice(item: {
+  listings: { precio_b2c: number } | null;
+  paquetes: { precio_total: number } | null;
+}) {
+  return item.listings?.precio_b2c ?? item.paquetes?.precio_total ?? 0;
+}
+
+export function cartItemTitle(item: {
+  listings: { titulo: string } | null;
+  paquetes: { titulo: string } | null;
+}) {
+  return item.listings?.titulo ?? item.paquetes?.titulo ?? "";
+}
+
+export async function addToCart(
+  userId: string,
+  item: { listingId: string } | { paqueteId: string }
+) {
   const supabase = await createClient();
   const carritoId = await getOrCreateCarritoId(supabase, userId);
+  const column = "listingId" in item ? "listing_id" : "paquete_id";
+  const value = "listingId" in item ? item.listingId : item.paqueteId;
 
   const { data: existing } = await supabase
     .from("carrito_items")
     .select("id, cantidad")
     .eq("carrito_id", carritoId)
-    .eq("listing_id", listingId)
+    .eq(column, value)
     .maybeSingle();
 
   if (existing) {
@@ -54,9 +73,11 @@ export async function addToCart(userId: string, listingId: string) {
     return;
   }
 
-  const { error } = await supabase
-    .from("carrito_items")
-    .insert({ carrito_id: carritoId, listing_id: listingId, cantidad: 1 });
+  const { error } = await supabase.from("carrito_items").insert(
+    "listingId" in item
+      ? { carrito_id: carritoId, listing_id: item.listingId, cantidad: 1 }
+      : { carrito_id: carritoId, paquete_id: item.paqueteId, cantidad: 1 }
+  );
   if (error) throw error;
 }
 

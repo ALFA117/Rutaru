@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCartItems } from "@/lib/data/cart";
+import { getCartItems, cartItemPrice, cartItemTitle } from "@/lib/data/cart";
 import { removeFromCartAction } from "@/lib/cart/actions";
 import { Button } from "@/components/ui/button";
 
@@ -20,7 +20,7 @@ export default async function CarritoPage() {
 
   const items = await getCartItems(user.id);
   const subtotal = items.reduce(
-    (acc, item) => acc + item.cantidad * (item.listings?.precio_b2c ?? 0),
+    (acc, item) => acc + item.cantidad * cartItemPrice(item),
     0
   );
 
@@ -43,16 +43,14 @@ export default async function CarritoPage() {
               className="flex items-center justify-between gap-4 rounded-lg border border-border p-4"
             >
               <div>
-                <p className="font-medium">{item.listings?.titulo}</p>
+                <p className="font-medium">{cartItemTitle(item)}</p>
                 <p className="text-sm text-muted-foreground">
                   Cantidad: {item.cantidad}
                 </p>
               </div>
               <div className="flex items-center gap-4">
                 <span className="tabular-nums font-medium">
-                  {currency.format(
-                    item.cantidad * (item.listings?.precio_b2c ?? 0)
-                  )}
+                  {currency.format(item.cantidad * cartItemPrice(item))}
                 </span>
                 <form action={removeFromCartAction}>
                   <input type="hidden" name="itemId" value={item.id} />

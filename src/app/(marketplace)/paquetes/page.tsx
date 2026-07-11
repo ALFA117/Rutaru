@@ -1,6 +1,8 @@
 import { getPaquetes } from "@/lib/data/listings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { addToCartAction } from "@/lib/cart/actions";
 
 const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -39,6 +41,12 @@ export default async function PaquetesPage() {
                   {Array.isArray(p.componentes) ? p.componentes.length : 0}{" "}
                   componentes incluidos
                 </p>
+                <form action={addToCartAction} className="mt-4">
+                  <input type="hidden" name="paqueteId" value={p.id} />
+                  <Button type="submit" className="w-full">
+                    Agregar al carrito
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           ))}
