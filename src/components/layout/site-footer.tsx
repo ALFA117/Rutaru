@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { siteConfig } from "@/config/site";
 
 export function SiteFooter() {
@@ -7,9 +8,12 @@ export function SiteFooter() {
         <p className="font-heading text-base text-foreground">
           {siteConfig.name} — {siteConfig.slogan}
         </p>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <span>{siteConfig.contact.email}</span>
           <span>{siteConfig.contact.instagram}</span>
+          <Link href="/guia-de-pruebas" className="underline underline-offset-2">
+            Guía de pruebas
+          </Link>
         </div>
       </div>
     </footer>

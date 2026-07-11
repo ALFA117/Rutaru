@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { login } from "./actions";
+import { login, loginDemo } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,16 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-const DEMO_USERS = [
-  { role: "Operador", email: "operador@rutaru.demo" },
-  { role: "Agencia", email: "agencia@rutaru.demo" },
-  { role: "Admin", email: "admin@rutaru.demo" },
-  { role: "Afiliado", email: "afiliado@rutaru.demo" },
-  { role: "Cliente", email: "cliente@rutaru.demo" },
-];
-
-const DEMO_PASSWORD = "demo1234";
+import { DEMO_USERS, DEMO_PASSWORD } from "@/lib/auth/demo-users";
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, null);
@@ -79,24 +70,39 @@ export default function LoginPage() {
 
         <Card className="bg-secondary">
           <CardHeader>
-            <CardTitle className="text-lg">Usuarios demo</CardTitle>
+            <CardTitle className="text-lg">🧪 Cuentas demo para pruebas</CardTitle>
             <CardDescription>
-              Para el pitch — misma contraseña para los 5 roles
+              Misma contraseña para los 5 roles — entra con un clic o copia las
+              credenciales.{" "}
+              <Link href="/guia-de-pruebas" className="underline">
+                Ver guía de pruebas
+              </Link>
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="flex flex-col gap-3 text-sm">
               {DEMO_USERS.map((u) => (
-                <li key={u.email} className="flex items-center justify-between gap-2">
-                  <span className="font-medium">{u.role}</span>
-                  <code className="rounded bg-background px-2 py-1 text-xs">
-                    {u.email}
-                  </code>
+                <li
+                  key={u.email}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-background px-3 py-2"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{u.role}</span>
+                    <code className="text-xs text-muted-foreground">
+                      {u.email}
+                    </code>
+                  </div>
+                  <form action={loginDemo}>
+                    <input type="hidden" name="email" value={u.email} />
+                    <Button type="submit" size="sm" variant="outline">
+                      Entrar como {u.role}
+                    </Button>
+                  </form>
                 </li>
               ))}
             </ul>
             <p className="mt-4 text-sm">
-              Contraseña:{" "}
+              Contraseña (si prefieres entrar manualmente):{" "}
               <code className="rounded bg-background px-2 py-1 text-xs">
                 {DEMO_PASSWORD}
               </code>
