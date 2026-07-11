@@ -23,6 +23,10 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-chart-good: var(--chart-good);
+  --color-chart-warning: var(--chart-warning);
+  --color-chart-serious: var(--chart-serious);
+  --color-chart-critical: var(--chart-critical);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -68,11 +72,17 @@
   --border: #e5dfd3;
   --input: #e5dfd3;
   --ring: #c2662d;
+  /* Paleta categorica de graficas, validada con dataviz/validate_palette.js
+     (light y dark comparten hex; los 5 pasan lightness/chroma/CVD/contraste) */
   --chart-1: #c2662d;
-  --chart-2: #2f6f6b;
-  --chart-3: #111111;
-  --chart-4: #d4a94c;
-  --chart-5: #7a8b99;
+  --chart-2: #049c8c;
+  --chart-3: #b33a87;
+  --chart-4: #b08600;
+  --chart-5: #3b6fd1;
+  --chart-good: #0ca30c;
+  --chart-warning: #fab219;
+  --chart-serious: #ec835a;
+  --chart-critical: #d03b3b;
   --radius: 0.5rem;
   --sidebar: #f3eee4;
   --sidebar-foreground: #111111;
@@ -103,11 +113,15 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: #d97840;
-  --chart-1: #d97840;
-  --chart-2: #4a9c97;
-  --chart-3: #e8e2d6;
-  --chart-4: #e8c468;
-  --chart-5: #9aaab8;
+  --chart-1: #c2662d;
+  --chart-2: #049c8c;
+  --chart-3: #b33a87;
+  --chart-4: #b08600;
+  --chart-5: #3b6fd1;
+  --chart-good: #0ca30c;
+  --chart-warning: #fab219;
+  --chart-serious: #ec835a;
+  --chart-critical: #d03b3b;
   --sidebar: #1a1a1a;
   --sidebar-foreground: #faf7f2;
   --sidebar-primary: #faf7f2;
