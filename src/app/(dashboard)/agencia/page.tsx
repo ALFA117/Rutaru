@@ -45,6 +45,9 @@ export default async function AgenciaPage() {
           <Button asChild variant="outline" size="sm">
             <Link href="/agencia/catalogo">Catálogo B2B</Link>
           </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/agencia/paquetes/nuevo">Nuevo paquete</Link>
+          </Button>
           <form action={logout}>
             <Button variant="outline" size="sm" type="submit">
               Cerrar sesión

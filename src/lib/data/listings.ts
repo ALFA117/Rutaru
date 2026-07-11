@@ -111,3 +111,14 @@ export async function getPaquetes() {
   if (error) throw error;
   return data;
 }
+
+export async function getPaqueteBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("paquetes")
+    .select("*, agencias(razon_social)")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}

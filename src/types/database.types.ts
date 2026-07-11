@@ -227,6 +227,7 @@ export type Database = {
           id: string;
           agencia_id: string;
           titulo: string;
+          slug: string;
           componentes: Json;
           precio_total: number;
           markup_pct: number;
@@ -237,6 +238,7 @@ export type Database = {
           id?: string;
           agencia_id: string;
           titulo: string;
+          slug: string;
           componentes?: Json;
           precio_total: number;
           markup_pct?: number;

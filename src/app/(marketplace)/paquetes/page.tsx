@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getPaquetes } from "@/lib/data/listings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +31,9 @@ export default async function PaquetesPage() {
                   {p.agencias?.razon_social}
                 </Badge>
                 <CardTitle className="font-heading text-xl">
-                  {p.titulo}
+                  <Link href={`/paquete/${p.slug}`} className="hover:underline">
+                    {p.titulo}
+                  </Link>
                 </CardTitle>
               </CardHeader>
               <CardContent>
