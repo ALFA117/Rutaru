@@ -115,6 +115,7 @@ export type Database = {
           codigo_10: string;
           comision_pct: number;
           saldo: number;
+          pago_solicitado_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -125,6 +126,7 @@ export type Database = {
           codigo_10: string;
           comision_pct?: number;
           saldo?: number;
+          pago_solicitado_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
