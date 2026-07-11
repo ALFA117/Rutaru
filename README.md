@@ -4,7 +4,9 @@
 
 Marketplace turístico B2B/B2C (rutas, hospedaje, traslados, eventos, paquetes de agencia) con un motor de inteligencia de datos como diferenciador. Ver `PROMPT_MAESTRO_RUTARU.md` para el spec completo del producto.
 
-**Estado:** Etapas 1 (Esqueleto), 2 (Inteligencia) y 3 (B2B + Data Marketplace) completas. Roadmap público en `/roadmap`. Ver `CHANGELOG.md` para el detalle de cada bloque.
+**Estado:** Etapas 1 (Esqueleto), 2 (Inteligencia) y 3 (B2B + Data Marketplace) completas. Etapa 4 (Blockchain) en pausa — setup inicial de Hardhat listo, contratos aún sin desplegar. Roadmap público en `/roadmap`. Ver `CHANGELOG.md` para el detalle de cada bloque.
+
+**🚀 Producción (para pruebas del equipo):** https://rutaru.vercel.app — blockchain apagado (`NEXT_PUBLIC_BLOCKCHAIN_ENABLED=false`), la app funciona igual que en local. Entra desde `/login` con el panel de cuentas demo (botón "Entrar como..." por rol) y sigue la [guía de pruebas](https://rutaru.vercel.app/guia-de-pruebas) para el recorrido sugerido por rol.
 
 ## Stack
 
@@ -66,7 +68,7 @@ Diagrama ER completo y el patrón de RLS en [`docs/ERD.md`](docs/ERD.md). Nota i
 | Afiliado | `afiliado@rutaru.demo` | `demo1234` |
 | Cliente | `cliente@rutaru.demo` | `demo1234` |
 
-(También visibles en la pantalla de `/login`.)
+(También visibles en la pantalla de `/login`, con botón "Entrar como..." de un clic para cada uno. Recorrido de pruebas sugerido por rol en [`/guia-de-pruebas`](https://rutaru.vercel.app/guia-de-pruebas).)
 
 ## Desarrollo
 
