@@ -54,8 +54,20 @@ export default async function AdminDataPackagesPage() {
                   <p className="text-sm text-muted-foreground">{p.descripcion}</p>
                 )}
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col gap-4">
                 <DataPackagePreview preview={p.preview as never} />
+                <div className="flex gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <a href={`/api/data-packages/${p.id}/download?format=csv`}>
+                      Descargar CSV
+                    </a>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <a href={`/api/data-packages/${p.id}/download?format=json`}>
+                      Descargar JSON
+                    </a>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
