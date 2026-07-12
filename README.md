@@ -19,7 +19,7 @@ Marketplace turístico B2B/B2C (rutas, hospedaje, traslados, eventos, paquetes d
 - **Backend/BD:** Supabase (Postgres + Auth + RLS + Storage + Edge Functions + Realtime)
 - **IA:** Google Gemini (`@google/genai`, modelo `gemini-flash-latest`) vía `lib/ai/provider.ts` — capa de abstracción intercambiable a otro proveedor. `AI_MODE=live|mock` con fallback automático a datos mock si Gemini falla.
 - **Pagos:** Pioneer Pay (pasarela sandbox/emulada, siempre aprueba en Etapa 1)
-- **Blockchain (Plan B):** Ethereum Sepolia — 3 contratos (`RutaruTicket` NFT, `RutaruBooking` escrow, `RutaruAffiliate` comisiones) vía `ethers.js` + Hardhat 3, frontend con `wagmi`/RainbowKit. Feature flag `NEXT_PUBLIC_BLOCKCHAIN_ENABLED` (`false` en producción — Plan A intacto)
+- **Blockchain (Plan B):** Ethereum Sepolia — 3 contratos (`RutaruTicket` NFT, `RutaruBooking` escrow, `RutaruAffiliate` comisiones) vía `ethers.js` + Hardhat 3, frontend con `wagmi` + Privy (MetaMask o login embebido por email/Google). Feature flag `NEXT_PUBLIC_BLOCKCHAIN_ENABLED` (`false` en producción — Plan A intacto)
 
 ## Arquitectura
 
@@ -46,7 +46,7 @@ src/
 │   ├── blockchain/
 │   │   ├── config.ts                       # montos ETH simbolicos, helpers de Etherscan
 │   │   ├── provider.ts                     # ethers.js server-only (mint, escrow, comision, consentimiento)
-│   │   ├── wagmi-config.ts                 # config cliente wagmi/RainbowKit (perezosa)
+│   │   ├── wagmi-config.ts                 # config cliente wagmi + Privy (perezosa)
 │   │   ├── dashboard-actions.ts            # completar/cancelar reserva, wallet de operador/afiliado
 │   │   └── deployments/sepolia.json        # address+ABI de los 3 contratos desplegados
 │   ├── data/{listings,categorias,cart,orders,detail-href,
@@ -135,10 +135,12 @@ Todo detrás de `NEXT_PUBLIC_BLOCKCHAIN_ENABLED` (`false` por defecto — Plan A
 NEXT_PUBLIC_BLOCKCHAIN_ENABLED=true
 DEPLOYER_PRIVATE_KEY=          # llave privada de la wallet fondeada
 SEPOLIA_RPC_URL=                # Alchemy (alchemy.com, free tier) recomendado
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=  # gratis en cloud.reown.com, requerido por RainbowKit
+ETHERSCAN_API_KEY=              # etherscan.io -> My Profile -> API Keys, para verify de codigo fuente
+NEXT_PUBLIC_PRIVY_APP_ID=       # dashboard.privy.io -> app -> App ID
+PRIVY_APP_SECRET=               # dashboard.privy.io -> app -> App Secret (nunca exponer client-side)
 ```
 
-`npm run fund:check` verifica el balance de la wallet de deploy sin exponer la llave.
+`npm run fund:check` verifica el balance de la wallet de deploy sin exponer la llave. Conexión de wallet vía **Privy** (`@privy-io/react-auth` + `@privy-io/wagmi`) — soporta MetaMask (wallet externa) y login embebido por email/Google, útil para que alguien sin wallet propia pruebe el flujo Web3. Configurado para Sepolia únicamente (`defaultChain`/`supportedChains`).
 
 ### 3. Contratos ya desplegados en Sepolia real
 
@@ -152,6 +154,6 @@ Address+ABI en `src/lib/blockchain/deployments/sepolia.json`. Para re-desplegar:
 
 ### 4. Probar el flujo completo
 
-Con el flag activo y `npm run dev`: conectar MetaMask (red Sepolia) desde el botón del navbar → comprar en `/checkout` con "Pagar con cripto (testnet)" (montos simbólicos de ETH de prueba, no hay conversión real de MXN) → el NFT-ticket se acuña a tu wallet, verificable en `/verificar/[tokenId]` con QR → desde `/operador`, "Marcar completado" libera el escrow al operador (o "Cancelar y reembolsar" devuelve el pago al cliente) → si se usó un código de afiliado, la comisión se paga on-chain automáticamente.
+Con el flag activo y `npm run dev`: conectar wallet (MetaMask o login embebido con email/Google vía Privy) desde el botón del navbar → comprar en `/checkout` con "Pagar con cripto (testnet)" (montos simbólicos de ETH de prueba, no hay conversión real de MXN) → el NFT-ticket se acuña a tu wallet, verificable en `/verificar/[tokenId]` con QR → desde `/operador`, "Marcar completado" libera el escrow al operador (o "Cancelar y reembolsar" devuelve el pago al cliente) → si se usó un código de afiliado, la comisión se paga on-chain automáticamente.
 
 Tests de los 3 contratos: `cd contracts && npx hardhat test` (19 tests).

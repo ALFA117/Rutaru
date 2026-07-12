@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAccount, useWriteContract, useConfig } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { parseEther, type Abi } from "viem";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectWalletButton } from "@/components/blockchain/connect-wallet-button";
 import { Button } from "@/components/ui/button";
 import deployments from "@/lib/blockchain/deployments/sepolia.json";
 import { RESERVA_MONTO_ETH } from "@/lib/blockchain/config";
@@ -77,7 +77,7 @@ export function CryptoCheckoutPanel({
       </p>
 
       {!isConnected ? (
-        <ConnectButton />
+        <ConnectWalletButton />
       ) : (
         <>
           {error && (

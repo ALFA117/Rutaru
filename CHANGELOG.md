@@ -105,7 +105,9 @@ Sub-proyecto `/contracts` (Hardhat 3, `@nomicfoundation/hardhat-toolbox-mocha-et
 Migración `0021`: `profiles.consentimiento_hash`/`consentimiento_tx_hash`. El backend calcula `keccak256(userId + texto + timestamp)` y lo ancla con una transacción de valor cero, visible en `/cliente` con link a Etherscan.
 
 ### Bloque 6 — Conexión de wallet
-`wagmi@^2.19` + `@rainbow-me/rainbowkit@^2.2.11` (RainbowKit 2.x no soporta wagmi 3.x). `BlockchainProviders` envuelve la app solo cuando el flag está encendido — la config de wagmi (`getWagmiConfig()`) es perezosa para que Plan A nunca dependa de `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`. Botón "Conectar wallet" en el navbar, solo visible con el flag activo.
+`wagmi@^2.19` + `@privy-io/react-auth` + `@privy-io/wagmi` (bindings de Privy para wagmi — cambio sobre RainbowKit/WalletConnect, ver nota de actualización más abajo). `BlockchainProviders` envuelve la app solo cuando el flag está encendido — la config de wagmi (`getWagmiConfig()`) es perezosa para que Plan A nunca cargue Privy. Botón "Conectar wallet" en el navbar, solo visible con el flag activo.
+
+**Actualización:** RainbowKit/WalletConnect se reemplazaron por **Privy** (`@privy-io/react-auth` + `@privy-io/wagmi`) — soporta MetaMask (wallet externa) y login embebido por email/Google, para que alguien sin wallet propia pueda probar el flujo Web3. `wagmi` sigue siendo la capa de contrato (hooks sin cambios); Privy solo reemplaza la UI/conexión de wallet. Variables: `NEXT_PUBLIC_PRIVY_APP_ID` + `PRIVY_APP_SECRET` (server-only) en vez de `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`.
 
 ### Bloque 7 — Checkout con cripto
 `/checkout` gana la opción "Pagar con cripto (testnet)" (solo con el flag activo). El cliente firma `crearReserva` con su wallet; `api/checkout/crypto` verifica la transacción on-chain (lee el evento `ReservaCreada`), crea la orden con `estado='confirmada'` (distinto de `'pagada'` del sandbox), acuña el NFT-ticket y, si había código de afiliado, paga la comisión on-chain. Confirmación y "mis viajes" muestran links de Etherscan y a `/verificar/[tokenId]`.
