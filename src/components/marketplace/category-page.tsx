@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { ListingCard } from "@/components/marketplace/listing-card";
 import { FiltersBar } from "@/components/marketplace/filters-bar";
 import { getListingsByTipo, type ListingTipo } from "@/lib/data/listings";
+import { DETAIL_HREF } from "@/lib/data/detail-href";
 import { track } from "@/lib/tracking/track";
 
 export async function CategoryPage({
@@ -12,6 +13,10 @@ export async function CategoryPage({
 }: {
   tipo: ListingTipo;
   titulo: string;
+  // Opcional: por defecto resuelve via DETAIL_HREF (fuente unica de la
+  // verdad). Sin esto, las paginas que no lo pasaban (experiencias,
+  // traslados) renderizaban tarjetas sin ningun href -- ListingCard
+  // vuelve un <article> pelon, sin <Link>, click no hace nada.
   hrefFor?: (slug: string) => string;
   searchParams: Promise<{ destino?: string; orden?: string }>;
 }) {
@@ -48,7 +53,7 @@ export async function CategoryPage({
             <ListingCard
               key={listing.id}
               listing={listing}
-              href={hrefFor?.(listing.slug)}
+              href={(hrefFor ?? DETAIL_HREF[tipo])?.(listing.slug)}
             />
           ))}
         </div>

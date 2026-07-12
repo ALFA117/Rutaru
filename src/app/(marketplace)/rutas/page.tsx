@@ -22,7 +22,6 @@ export default function RutasPage({
     <CategoryPage
       tipo="ruta"
       titulo="Rutas y Tours"
-      hrefFor={(slug) => `/ruta/${slug}`}
       searchParams={searchParams}
     />
   );

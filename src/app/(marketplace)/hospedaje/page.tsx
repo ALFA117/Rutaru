@@ -22,7 +22,6 @@ export default function HospedajePage({
     <CategoryPage
       tipo="hospedaje"
       titulo="Hospedaje"
-      hrefFor={(slug) => `/hotel/${slug}`}
       searchParams={searchParams}
     />
   );

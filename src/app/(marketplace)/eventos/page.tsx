@@ -22,7 +22,6 @@ export default function EventosPage({
     <CategoryPage
       tipo="evento"
       titulo="Eventos y Boletaje"
-      hrefFor={(slug) => `/evento/${slug}`}
       searchParams={searchParams}
     />
   );
