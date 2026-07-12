@@ -25,12 +25,18 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
     default: "Rutaru — pocas rutas, todas buenas.",
     template: "%s — Rutaru",
   },
   description:
     "Marketplace de rutas, hospedaje, traslados y eventos. Conexión de inventario turístico B2B/B2C.",
+  openGraph: {
+    type: "website",
+    locale: "es_MX",
+    siteName: "Rutaru",
+  },
 };
 
 export default function RootLayout({
