@@ -25,13 +25,17 @@ export function StatTile({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-3xl font-semibold tabular-nums">{value}</p>
-            {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+        <div className="flex items-end justify-between gap-2">
+          <div className="min-w-0">
+            <p className="truncate text-2xl font-semibold tabular-nums sm:text-3xl" title={value}>
+              {value}
+            </p>
+            {hint && (
+              <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+            )}
           </div>
           {trendData && trendData.length > 1 && (
-            <div className="h-10 w-20 shrink-0">
+            <div className="hidden h-10 w-16 shrink-0 sm:block">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
                   <defs>

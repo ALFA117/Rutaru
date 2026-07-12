@@ -2,12 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import type { Listing } from "@/lib/data/listings";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export function ListingCard({
   listing,
@@ -41,7 +36,7 @@ export function ListingCard({
         )}
         <div className="mt-auto flex items-baseline justify-between pt-3">
           <span className="text-lg font-semibold tabular-nums">
-            {currency.format(listing.precio_b2c)}
+            {formatCurrency(listing.precio_b2c)}
           </span>
           <span className="text-xs text-muted-foreground">MXN</span>
         </div>

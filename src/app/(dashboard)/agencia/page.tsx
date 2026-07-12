@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { logout } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/format";
 
 const ESTADO_LABEL: Record<string, string> = {
   pendiente: "Cotizado",
@@ -16,12 +17,6 @@ const ESTADO_LABEL: Record<string, string> = {
   cancelada: "Cancelado",
   completada: "Completado",
 };
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 export default async function AgenciaPage() {
   const { user } = await requireRole("agencia");
@@ -48,9 +43,9 @@ export default async function AgenciaPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-y-2">
         <h1 className="font-heading text-3xl">Dashboard de agencia</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href="/agencia/catalogo">Catálogo B2B</Link>
           </Button>
@@ -66,9 +61,9 @@ export default async function AgenciaPage() {
       </div>
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-3">
-        <StatTile label="Ventas de paquetes" value={currency.format(totales.totalVentas)} />
+        <StatTile label="Ventas de paquetes" value={formatCurrency(totales.totalVentas)} />
         <StatTile label="Órdenes B2C" value={String(totales.totalOrdenes)} hint="paquetes vendidos a clientes" />
-        <StatTile label="Ticket promedio" value={currency.format(totales.ticketPromedio)} />
+        <StatTile label="Ticket promedio" value={formatCurrency(totales.ticketPromedio)} />
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -90,6 +85,7 @@ export default async function AgenciaPage() {
               data={topPaquetes ?? []}
               dataKey="monto"
               valueLabel="Ventas"
+              format="currency"
             />
           </CardContent>
         </Card>
@@ -109,10 +105,10 @@ export default async function AgenciaPage() {
                 <li key={p.id} className="flex justify-between py-2 text-sm">
                   <span>{p.titulo}</span>
                   <span className="tabular-nums text-muted-foreground">
-                    {currency.format(p.precio_total)} · markup {p.markup_pct}%
+                    {formatCurrency(p.precio_total)} · markup {p.markup_pct}%
                     {margen && (
                       <span className="ml-2 text-accent">
-                        margen {currency.format(margen.margen)}
+                        margen {formatCurrency(margen.margen)}
                       </span>
                     )}
                   </span>
@@ -171,7 +167,7 @@ export default async function AgenciaPage() {
                       </Link>
                     </div>
                     <span className="tabular-nums text-muted-foreground">
-                      {currency.format(o.total)}
+                      {formatCurrency(o.total)}
                     </span>
                   </li>
                 ))}

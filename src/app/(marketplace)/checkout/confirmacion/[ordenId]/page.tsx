@@ -5,12 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { etherscanTokenUrl, etherscanTxUrl } from "@/lib/blockchain/config";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function ConfirmacionPage({
   params,
@@ -49,7 +44,7 @@ export default async function ConfirmacionPage({
                 <span>
                   {item.listings?.titulo} × {item.cantidad}
                 </span>
-                <span className="tabular-nums">{currency.format(item.precio)}</span>
+                <span className="tabular-nums">{formatCurrency(item.precio)}</span>
               </div>
               {item.nft_tickets?.[0] && (
                 <div className="flex flex-wrap gap-3 text-xs">
@@ -76,19 +71,19 @@ export default async function ConfirmacionPage({
           ))}
           <div className="flex justify-between border-t border-border pt-3 text-sm">
             <span>Subtotal</span>
-            <span className="tabular-nums">{currency.format(orden.subtotal)}</span>
+            <span className="tabular-nums">{formatCurrency(orden.subtotal)}</span>
           </div>
           {orden.descuento > 0 && (
             <div className="flex justify-between text-sm text-accent">
               <span>Descuento ({orden.codigo_afiliado})</span>
               <span className="tabular-nums">
-                -{currency.format(orden.descuento)}
+                -{formatCurrency(orden.descuento)}
               </span>
             </div>
           )}
           <div className="flex justify-between font-heading text-lg">
             <span>Total</span>
-            <span className="tabular-nums">{currency.format(orden.total)}</span>
+            <span className="tabular-nums">{formatCurrency(orden.total)}</span>
           </div>
           {orden.pagos?.[0] && (
             <p className="text-xs text-muted-foreground">

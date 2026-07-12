@@ -12,15 +12,10 @@ import {
   actualizarConsentimientoAction,
   anclarConsentimientoAction,
 } from "@/lib/perfil/actions";
+import { formatCurrency } from "@/lib/format";
 import type { ListingTipo } from "@/lib/data/listings";
 import { BLOCKCHAIN_ENABLED } from "@/config/flags";
 import { etherscanTokenUrl, etherscanTxUrl } from "@/lib/blockchain/config";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 const fecha = new Intl.DateTimeFormat("es-MX", {
   day: "numeric",
@@ -45,7 +40,7 @@ export default async function ClientePage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-y-2">
         <h1 className="font-heading text-3xl">Hola, {profile.nombre ?? "viajero"}</h1>
         <form action={logout}>
           <Button variant="outline" size="sm" type="submit">
@@ -77,7 +72,7 @@ export default async function ClientePage() {
                       </span>
                     </div>
                     <span className="font-medium tabular-nums">
-                      {currency.format(orden.total)}
+                      {formatCurrency(orden.total)}
                     </span>
                   </div>
                   <ul className="text-sm text-muted-foreground">

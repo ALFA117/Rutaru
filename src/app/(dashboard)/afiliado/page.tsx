@@ -11,12 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BLOCKCHAIN_ENABLED } from "@/config/flags";
 import { actualizarWalletAfiliadoAction } from "@/lib/blockchain/dashboard-actions";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function AfiliadoPage() {
   const { user } = await requireRole("afiliado");
@@ -43,7 +38,7 @@ export default async function AfiliadoPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-y-2">
         <h1 className="font-heading text-3xl">Dashboard de afiliado</h1>
         <form action={logout}>
           <Button variant="outline" size="sm" type="submit">
@@ -82,12 +77,12 @@ export default async function AfiliadoPage() {
         />
         <StatTile
           label="Ventas atribuidas"
-          value={currency.format(totales.ventasAtribuidas)}
+          value={formatCurrency(totales.ventasAtribuidas)}
         />
         <StatTile
           label="Comisiones"
-          value={currency.format(totales.totalComisiones)}
-          hint={`${currency.format(totales.comisionesPendientes)} pendientes`}
+          value={formatCurrency(totales.totalComisiones)}
+          hint={`${formatCurrency(totales.comisionesPendientes)} pendientes`}
           trend={serieComisiones.slice(-14).map((v) => v.monto)}
         />
       </div>
@@ -110,7 +105,7 @@ export default async function AfiliadoPage() {
             <p className="text-sm text-muted-foreground">
               Pendiente por cobrar:{" "}
               <span className="font-medium text-foreground">
-                {currency.format(totales.comisionesPendientes)}
+                {formatCurrency(totales.comisionesPendientes)}
               </span>
             </p>
             {afiliado.pago_solicitado_at ? (

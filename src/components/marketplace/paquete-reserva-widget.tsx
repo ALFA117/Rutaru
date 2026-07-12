@@ -4,12 +4,7 @@ import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { reservarPaqueteAction } from "@/lib/cart/actions";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export function PaqueteReservaWidget({
   paqueteId,
@@ -51,7 +46,7 @@ export function PaqueteReservaWidget({
 
       <div className="flex items-center justify-between border-t border-border pt-3">
         <span className="text-sm font-medium">Total</span>
-        <span className="font-heading text-xl tabular-nums">{currency.format(total)}</span>
+        <span className="font-heading text-xl tabular-nums">{formatCurrency(total)}</span>
       </div>
 
       <form action={reservarPaqueteAction}>

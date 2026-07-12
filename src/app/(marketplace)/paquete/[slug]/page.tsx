@@ -10,12 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaqueteReservaWidget } from "@/components/marketplace/paquete-reserva-widget";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 const fecha = new Intl.DateTimeFormat("es-MX", {
   day: "numeric",
@@ -207,7 +202,7 @@ export default async function PaqueteDetailPage({
         <Card className="h-fit lg:sticky lg:top-24">
           <CardHeader>
             <CardTitle className="font-heading text-2xl tabular-nums">
-              {currency.format(paquete.precio_total)}
+              {formatCurrency(paquete.precio_total)}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">

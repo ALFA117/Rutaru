@@ -13,12 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function ComprarAllotmentPage({
   searchParams,
@@ -40,7 +35,7 @@ export default async function ComprarAllotmentPage({
       <Card>
         <CardHeader>
           <CardTitle className="font-heading text-lg">
-            Tarifa neta: {currency.format(listing.precio_neto_b2b ?? 0)} / lugar
+            Tarifa neta: {formatCurrency(listing.precio_neto_b2b ?? 0)} / lugar
           </CardTitle>
         </CardHeader>
         <CardContent>

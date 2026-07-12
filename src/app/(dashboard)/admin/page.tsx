@@ -11,12 +11,7 @@ import { InsightsPanel } from "@/components/dashboard/insights-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { logout } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 function parseRango(valor?: string): RangoFechas {
   if (valor === "7" || valor === "90") return Number(valor) as RangoFechas;
@@ -58,13 +53,13 @@ export default async function AdminPage({
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatTile
           label="Ventas totales"
-          value={currency.format(totales.totalVentas)}
+          value={formatCurrency(totales.totalVentas)}
           trend={serieVentas.slice(-14).map((v) => v.monto)}
         />
         <StatTile label="Eventos registrados" value={String(totales.totalEventos)} />
         <StatTile
           label="Comisiones generadas"
-          value={currency.format(totales.totalComisiones)}
+          value={formatCurrency(totales.totalComisiones)}
         />
       </div>
 
@@ -85,7 +80,7 @@ export default async function AdminPage({
             <CardTitle className="font-heading text-lg">Top 5 listings</CardTitle>
           </CardHeader>
           <CardContent>
-            <TopBarChart data={topListings} dataKey="monto" valueLabel="Ventas" />
+            <TopBarChart data={topListings} dataKey="monto" valueLabel="Ventas" format="currency" />
           </CardContent>
         </Card>
 
@@ -94,7 +89,7 @@ export default async function AdminPage({
             <CardTitle className="font-heading text-lg">Top afiliados</CardTitle>
           </CardHeader>
           <CardContent>
-            <TopBarChart data={topAfiliados} dataKey="monto" valueLabel="Comisión" />
+            <TopBarChart data={topAfiliados} dataKey="monto" valueLabel="Comisión" format="currency" />
           </CardContent>
         </Card>
 
@@ -105,7 +100,7 @@ export default async function AdminPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <TopBarChart data={categorias} dataKey="monto" valueLabel="Ventas" />
+            <TopBarChart data={categorias} dataKey="monto" valueLabel="Ventas" format="currency" />
           </CardContent>
         </Card>
 
@@ -116,7 +111,7 @@ export default async function AdminPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <TopBarChart data={destinos} dataKey="monto" valueLabel="Ventas" />
+            <TopBarChart data={destinos} dataKey="monto" valueLabel="Ventas" format="currency" />
           </CardContent>
         </Card>
 

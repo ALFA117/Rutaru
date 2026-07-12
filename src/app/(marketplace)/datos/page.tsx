@@ -1,3 +1,4 @@
+import { DatabaseZap } from "lucide-react";
 import { getDataPackagesPublicadas } from "@/lib/data/data-packages";
 import { DataPackagePreview } from "@/components/data-marketplace/data-package-preview";
 import { comprarDataPackageAction } from "@/lib/data-marketplace/compra-actions";
@@ -5,12 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function DataMarketplacePage() {
   const paquetes = await getDataPackagesPublicadas();
@@ -32,9 +28,10 @@ export default async function DataMarketplacePage() {
       </p>
 
       {paquetes.length === 0 ? (
-        <p className="py-16 text-center text-muted-foreground">
-          Aún no hay paquetes de datos publicados.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
+          <DatabaseZap className="h-10 w-10" />
+          <p>Aún no hay paquetes de datos publicados.</p>
+        </div>
       ) : (
         <div className="flex flex-col gap-8">
           {paquetes.map((p) => (
@@ -47,7 +44,7 @@ export default async function DataMarketplacePage() {
                       <Badge>Vendido a {p.comprador_empresa}</Badge>
                     )}
                     <span className="tabular-nums font-medium">
-                      {currency.format(p.precio)}/mes
+                      {formatCurrency(p.precio)}/mes
                     </span>
                   </div>
                 </div>

@@ -1,15 +1,11 @@
 import Link from "next/link";
+import { PackageSearch } from "lucide-react";
 import { getPaquetes } from "@/lib/data/listings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { addToCartAction } from "@/lib/cart/actions";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function PaquetesPage() {
   const paquetes = await getPaquetes();
@@ -19,9 +15,13 @@ export default async function PaquetesPage() {
       <h1 className="mb-8 font-heading text-3xl">Paquetes de Agencia</h1>
 
       {paquetes.length === 0 ? (
-        <p className="py-16 text-center text-muted-foreground">
-          Aún no hay paquetes publicados.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
+          <PackageSearch className="h-10 w-10" />
+          <p>Aún no hay paquetes publicados.</p>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/rutas">Explorar rutas</Link>
+          </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {paquetes.map((p) => (
@@ -38,7 +38,7 @@ export default async function PaquetesPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-semibold tabular-nums">
-                  {currency.format(p.precio_total)}
+                  {formatCurrency(p.precio_total)}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {Array.isArray(p.componentes) ? p.componentes.length : 0}{" "}

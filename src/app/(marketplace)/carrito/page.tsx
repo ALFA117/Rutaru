@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ShoppingCart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCartItems, cartItemPrice, cartItemTitle } from "@/lib/data/cart";
 import { removeFromCartAction } from "@/lib/cart/actions";
 import { Button } from "@/components/ui/button";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function CarritoPage() {
   const supabase = await createClient();
@@ -29,7 +25,8 @@ export default async function CarritoPage() {
       <h1 className="mb-8 font-heading text-3xl">Tu carrito</h1>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-start gap-4 py-16">
+        <div className="flex flex-col items-center gap-4 py-16 text-center">
+          <ShoppingCart className="h-10 w-10 text-muted-foreground" />
           <p className="text-muted-foreground">Tu carrito está vacío.</p>
           <Button asChild>
             <Link href="/rutas">Explorar rutas</Link>
@@ -50,7 +47,7 @@ export default async function CarritoPage() {
               </div>
               <div className="flex items-center gap-4">
                 <span className="tabular-nums font-medium">
-                  {currency.format(item.cantidad * cartItemPrice(item))}
+                  {formatCurrency(item.cantidad * cartItemPrice(item))}
                 </span>
                 <form action={removeFromCartAction}>
                   <input type="hidden" name="itemId" value={item.id} />
@@ -65,7 +62,7 @@ export default async function CarritoPage() {
           <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
             <span className="font-heading text-xl">Subtotal</span>
             <span className="font-heading text-xl tabular-nums">
-              {currency.format(subtotal)}
+              {formatCurrency(subtotal)}
             </span>
           </div>
 

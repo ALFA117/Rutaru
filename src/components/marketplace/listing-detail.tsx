@@ -19,6 +19,7 @@ import {
   MessageCircle,
   CheckCircle2,
 } from "lucide-react";
+import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,12 +40,6 @@ import { track } from "@/lib/tracking/track";
 
 type Disponibilidad = Database["public"]["Tables"]["disponibilidad"]["Row"];
 type Resena = Database["public"]["Tables"]["resenas"]["Row"];
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 const fecha = new Intl.DateTimeFormat("es-MX", {
   day: "numeric",
@@ -214,7 +209,7 @@ export async function ListingDetail({
                   >
                     <span>{z.nombre}</span>
                     <span className="tabular-nums font-medium">
-                      {currency.format(z.precio)}
+                      {formatCurrency(z.precio)}
                     </span>
                   </li>
                 ))}
@@ -304,7 +299,7 @@ export async function ListingDetail({
           <CardHeader>
             <CardTitle className="flex items-baseline justify-between font-heading text-2xl">
               <span className="tabular-nums">
-                {currency.format(listing.precio_b2c)}
+                {formatCurrency(listing.precio_b2c)}
               </span>
               <span className="text-sm font-normal text-muted-foreground">
                 MXN

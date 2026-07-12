@@ -6,12 +6,7 @@ import { Minus, Plus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { reservarAction } from "@/lib/cart/actions";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 type DisponibilidadRow = { fecha: string; cupo_disponible: number };
 
@@ -71,7 +66,7 @@ export function ReservaWidget({
           >
             <Minus className="h-3.5 w-3.5" />
           </Button>
-          <span className="w-4 text-center text-sm tabular-nums">{cantidad}</span>
+          <span className="w-5 shrink-0 text-center text-sm tabular-nums">{cantidad}</span>
           <Button
             type="button"
             size="icon"
@@ -86,7 +81,7 @@ export function ReservaWidget({
 
       <div className="flex items-center justify-between border-t border-border pt-3">
         <span className="text-sm font-medium">Total</span>
-        <span className="font-heading text-xl tabular-nums">{currency.format(total)}</span>
+        <span className="font-heading text-xl tabular-nums">{formatCurrency(total)}</span>
       </div>
 
       <form action={reservarAction}>

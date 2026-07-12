@@ -9,12 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 const fechaCorta = new Intl.DateTimeFormat("es-MX", {
   day: "numeric",
@@ -56,14 +51,14 @@ export function SalesAreaChart({
           tickLine={false}
         />
         <YAxis
-          tickFormatter={(v) => currency.format(v)}
+          tickFormatter={(v) => formatCurrency(v)}
           tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
           width={64}
         />
         <Tooltip
-          formatter={(value) => currency.format(Number(value))}
+          formatter={(value) => formatCurrency(Number(value))}
           labelFormatter={(v) => fechaCorta.format(new Date(`${v}T00:00:00`))}
           contentStyle={{
             background: "var(--popover)",

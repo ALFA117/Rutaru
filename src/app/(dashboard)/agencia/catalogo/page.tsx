@@ -9,14 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 export default async function CatalogoB2BPage() {
   await requireRole("agencia");
@@ -31,7 +26,7 @@ export default async function CatalogoB2BPage() {
       </p>
 
       <div className="overflow-x-auto rounded-lg border border-border">
-        <Table>
+        <Table className="min-w-[640px]">
           <TableHeader>
             <TableRow>
               <TableHead>Listing</TableHead>
@@ -52,13 +47,13 @@ export default async function CatalogoB2BPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {currency.format(l.precio_b2c)}
+                  {formatCurrency(l.precio_b2c)}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {currency.format(l.precio_neto_b2b)}
+                  {formatCurrency(l.precio_neto_b2b)}
                 </TableCell>
                 <TableCell className="text-right tabular-nums text-accent">
-                  {currency.format(l.margen)} ({l.margenPct}%)
+                  {formatCurrency(l.margen)} ({l.margenPct}%)
                 </TableCell>
                 <TableCell>
                   <Button asChild size="sm" variant="outline">

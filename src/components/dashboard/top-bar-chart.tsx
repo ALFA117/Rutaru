@@ -10,6 +10,7 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts";
+import { formatCurrency } from "@/lib/format";
 
 const COLORS = [
   "var(--chart-1)",
@@ -19,17 +20,26 @@ const COLORS = [
   "var(--chart-5)",
 ];
 
+const numberFormatter = new Intl.NumberFormat("es-MX");
+
+// `format` es un string (serializable a traves del limite RSC) en vez de una
+// funcion -- pasar una funcion como prop desde un Server Component a este
+// Client Component revienta la serializacion de React ("Functions cannot be
+// passed directly to Client Components").
 export function TopBarChart({
   data,
   dataKey,
   nameKey = "titulo",
   valueLabel,
+  format = "number",
 }: {
   data: Record<string, string | number>[];
   dataKey: string;
   nameKey?: string;
   valueLabel: string;
+  format?: "currency" | "number";
 }) {
+  const formatValue = format === "currency" ? formatCurrency : (v: number) => numberFormatter.format(v);
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
@@ -48,6 +58,7 @@ export function TopBarChart({
         <CartesianGrid horizontal={false} stroke="var(--border)" strokeDasharray="3 3" />
         <XAxis
           type="number"
+          tickFormatter={formatValue}
           tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
@@ -55,13 +66,14 @@ export function TopBarChart({
         <YAxis
           type="category"
           dataKey={nameKey}
-          width={140}
-          tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+          width={110}
+          tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+          tickFormatter={(v: string) => (v.length > 16 ? `${v.slice(0, 15)}…` : v)}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
-          formatter={(value) => [value, valueLabel]}
+          formatter={(value) => [formatValue(Number(value)), valueLabel]}
           contentStyle={{
             background: "var(--popover)",
             border: "1px solid var(--border)",

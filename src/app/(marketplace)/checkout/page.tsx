@@ -5,12 +5,7 @@ import { getCartItems, cartItemPrice, cartItemTitle } from "@/lib/data/cart";
 import { CheckoutForm } from "./checkout-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FALLBACK_WALLET } from "@/lib/blockchain/config";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function CheckoutPage() {
   const supabase = await createClient();
@@ -56,13 +51,13 @@ export default async function CheckoutPage() {
                 {cartItemTitle(item)} × {item.cantidad}
               </span>
               <span className="tabular-nums">
-                {currency.format(item.cantidad * cartItemPrice(item))}
+                {formatCurrency(item.cantidad * cartItemPrice(item))}
               </span>
             </div>
           ))}
           <div className="mt-2 flex justify-between border-t border-border pt-3 font-heading text-lg">
             <span>Subtotal</span>
-            <span className="tabular-nums">{currency.format(subtotal)}</span>
+            <span className="tabular-nums">{formatCurrency(subtotal)}</span>
           </div>
           <p className="text-xs text-muted-foreground">
             El descuento del código de afiliado se aplica al confirmar el pago.

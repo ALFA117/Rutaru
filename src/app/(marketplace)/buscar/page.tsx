@@ -4,12 +4,7 @@ import { DETAIL_HREF } from "@/lib/data/detail-href";
 import { ListingCard } from "@/components/marketplace/listing-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 const TIPO_VALIDO = new Set(["paquete", "ruta", "hospedaje", "traslado"]);
 
@@ -73,7 +68,7 @@ export default async function BuscarPage({
                   <Badge className="w-fit">Paquete</Badge>
                   <h2 className="font-heading text-lg">{p.titulo}</h2>
                   <span className="tabular-nums font-medium">
-                    {currency.format(p.precio_total)}
+                    {formatCurrency(p.precio_total)}
                   </span>
                 </CardContent>
               </Card>

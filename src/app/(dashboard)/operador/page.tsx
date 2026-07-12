@@ -16,12 +16,7 @@ import {
   completarServicioAction,
   cancelarReservaAction,
 } from "@/lib/blockchain/dashboard-actions";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { formatCurrency } from "@/lib/format";
 
 export default async function OperadorPage() {
   const { user } = await requireRole("operador");
@@ -51,7 +46,7 @@ export default async function OperadorPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-y-2">
         <h1 className="font-heading text-3xl">Dashboard de operador</h1>
         <form action={logout}>
           <Button variant="outline" size="sm" type="submit">
@@ -63,13 +58,13 @@ export default async function OperadorPage() {
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatTile
           label="Ventas totales"
-          value={currency.format(totales.totalVentas)}
+          value={formatCurrency(totales.totalVentas)}
           trend={ventas.slice(-14).map((v) => v.monto)}
         />
         <StatTile label="Reservas" value={String(totales.totalReservas)} />
         <StatTile
           label="Ticket promedio"
-          value={currency.format(totales.ticketPromedio)}
+          value={formatCurrency(totales.ticketPromedio)}
         />
         <StatTile label="Ocupación" value={`${totales.ocupacionPct}%`} hint="próximos 90 días" />
       </div>
@@ -108,7 +103,7 @@ export default async function OperadorPage() {
               <li key={l.id} className="flex justify-between py-2 text-sm">
                 <span>{l.titulo}</span>
                 <span className="tabular-nums text-muted-foreground">
-                  {currency.format(l.precio_b2c)}
+                  {formatCurrency(l.precio_b2c)}
                 </span>
               </li>
             ))}
@@ -176,7 +171,7 @@ export default async function OperadorPage() {
                           Ver pago en Etherscan ↗
                         </a>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <form action={completarServicioAction}>
                           <input type="hidden" name="ordenId" value={r.ordenId} />
                           <Button type="submit" size="sm">

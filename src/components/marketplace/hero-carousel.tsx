@@ -11,14 +11,9 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 const TIPO_LABEL: Record<string, string> = {
   ruta: "Ruta",
@@ -86,7 +81,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 </h2>
                 <div className="flex flex-wrap items-center gap-4">
                   <span className="font-heading text-xl text-white tabular-nums">
-                    {currency.format(s.precio)}
+                    {formatCurrency(s.precio)}
                   </span>
                   <Button asChild size="sm">
                     <Link href={s.href}>Ver detalle</Link>

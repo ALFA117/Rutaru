@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatCurrency } from "@/lib/format";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
@@ -28,12 +29,6 @@ type ListingOpcion = {
   estado: string | null;
   ciudad: string | null;
 };
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 // Orden fijo de secciones del constructor (pedido explicito): Hospedaje
 // primero, luego Experiencias/Rutas juntas, luego Traslados, luego Eventos.
@@ -269,7 +264,7 @@ export function PaqueteBuilder({ catalogo }: { catalogo: ListingOpcion[] }) {
                       {l.titulo}
                     </span>
                     <span className="text-xs tabular-nums text-muted-foreground">
-                      {currency.format(l.precio_neto_b2b)}
+                      {formatCurrency(l.precio_neto_b2b)}
                     </span>
                   </label>
                 ))}
@@ -349,11 +344,11 @@ export function PaqueteBuilder({ catalogo }: { catalogo: ListingOpcion[] }) {
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Costo neto</span>
-            <span className="tabular-nums">{currency.format(costoNeto)}</span>
+            <span className="tabular-nums">{formatCurrency(costoNeto)}</span>
           </div>
           <div className="flex justify-between font-heading text-xl">
             <span>Precio público</span>
-            <span className="tabular-nums">{currency.format(precioTotal)}</span>
+            <span className="tabular-nums">{formatCurrency(precioTotal)}</span>
           </div>
           {state?.error && (
             <p role="alert" className="text-sm text-destructive">

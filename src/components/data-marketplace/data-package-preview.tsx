@@ -22,6 +22,7 @@ export function DataPackagePreview({ preview }: { preview: Preview }) {
             data={preview.ventas_por_destino}
             dataKey="monto"
             valueLabel="Ventas"
+            format="currency"
           />
         </div>
       )}
