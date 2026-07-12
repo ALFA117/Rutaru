@@ -29,6 +29,9 @@ export function ActivityHeatmap({ data }: { data: Celda[] }) {
 
   return (
     <div className="overflow-x-auto">
+      <p className="mb-2 text-[11px] text-muted-foreground sm:hidden">
+        Desliza para ver todas las horas →
+      </p>
       <div className="min-w-[560px]">
         <div className="mb-1 grid grid-cols-[3rem_repeat(24,1fr)] gap-[2px] text-[10px] text-muted-foreground">
           <span />

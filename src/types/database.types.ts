@@ -701,6 +701,14 @@ export type Database = {
       };
     };
     Views: {
+      agencias_publico: {
+        Row: {
+          id: string;
+          razon_social: string;
+          pais: string | null;
+        };
+        Relationships: [];
+      };
       listings_publico: {
         Row: {
           id: string;

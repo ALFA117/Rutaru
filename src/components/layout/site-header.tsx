@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CATEGORIAS } from "@/lib/data/categorias";
 import { BLOCKCHAIN_ENABLED } from "@/config/flags";
 import { ConnectWalletButton } from "@/components/blockchain/connect-wallet-button";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -49,9 +50,10 @@ export async function SiteHeader() {
 
         <div className="flex items-center gap-3">
           {BLOCKCHAIN_ENABLED && <ConnectWalletButton />}
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="min-h-11">
             <Link href={accountHref}>{user ? "Mi cuenta" : "Iniciar sesión"}</Link>
           </Button>
+          <MobileNav categorias={CATEGORIAS} />
         </div>
       </div>
     </header>

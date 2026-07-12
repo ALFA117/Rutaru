@@ -24,6 +24,12 @@ export async function POST(request: Request) {
   if (items.length === 0) {
     return NextResponse.json({ error: "El carrito está vacío" }, { status: 400 });
   }
+  if (items.some((item) => cartItemPrice(item) <= 0)) {
+    return NextResponse.json(
+      { error: "Uno de los artículos del carrito ya no está disponible. Quítalo e intenta de nuevo." },
+      { status: 409 }
+    );
+  }
 
   const subtotal = items.reduce(
     (acc, item) => acc + item.cantidad * cartItemPrice(item),

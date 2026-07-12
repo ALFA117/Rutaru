@@ -147,11 +147,13 @@ export function BuscadorReservas({ ciudades }: { ciudades: string[] }) {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="justify-start font-normal">
-                <Users className="h-4 w-4" />
-                {adultos} adulto{adultos !== 1 ? "s" : ""}
-                {ninos > 0 ? `, ${ninos} niño${ninos !== 1 ? "s" : ""}` : ""}
-                {" · "}
-                {habitaciones} habitación{habitaciones !== 1 ? "es" : ""}
+                <Users className="h-4 w-4 shrink-0" />
+                <span className="truncate">
+                  {adultos} adulto{adultos !== 1 ? "s" : ""}
+                  {ninos > 0 ? `, ${ninos} niño${ninos !== 1 ? "s" : ""}` : ""}
+                  {" · "}
+                  {habitaciones} habitación{habitaciones !== 1 ? "es" : ""}
+                </span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="flex w-64 flex-col gap-3">
@@ -202,7 +204,7 @@ function ContadorFila({
         >
           <Minus className="h-3.5 w-3.5" />
         </Button>
-        <span className="w-4 text-center text-sm tabular-nums">{value}</span>
+        <span className="w-5 shrink-0 text-center text-sm tabular-nums">{value}</span>
         <Button
           type="button"
           size="icon"

@@ -131,11 +131,11 @@ export function RutaChatbot() {
 
       <Button
         size="icon"
-        className="h-14 w-14 rounded-full shadow-lg"
+        className="h-11 w-11 rounded-full shadow-lg sm:h-14 sm:w-14"
         onClick={() => setOpen((v) => !v)}
         aria-label="Abrir chat con Ruta"
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
     </div>
   );

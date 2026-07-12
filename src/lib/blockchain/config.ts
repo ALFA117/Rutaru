@@ -14,8 +14,11 @@ export function etherscanTxUrl(txHash: string) {
   return `https://sepolia.etherscan.io/tx/${txHash}`;
 }
 
-export function etherscanAddressUrl(address: string) {
-  return `https://sepolia.etherscan.io/address/${address}`;
+// `verificado` agrega #code -- los 3 contratos de Rutaru estan verificados
+// en Etherscan, asi que el link salta directo al codigo fuente en vez de
+// solo la lista de transacciones.
+export function etherscanAddressUrl(address: string, verificado = false) {
+  return `https://sepolia.etherscan.io/address/${address}${verificado ? "#code" : ""}`;
 }
 
 export function etherscanTokenUrl(contractAddress: string, tokenId: string | number) {

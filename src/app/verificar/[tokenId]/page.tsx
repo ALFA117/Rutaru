@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { createClient } from "@/lib/supabase/server";
 import { leerTicketOnChain } from "@/lib/blockchain/provider";
-import { etherscanTokenUrl, etherscanTxUrl } from "@/lib/blockchain/config";
+import { etherscanTokenUrl, etherscanTxUrl, etherscanAddressUrl } from "@/lib/blockchain/config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -93,7 +93,15 @@ export default async function VerificarPage({
             rel="noopener noreferrer"
             className="mt-2 underline"
           >
-            Ver contrato en Etherscan ↗
+            Ver NFT en Etherscan ↗
+          </a>
+          <a
+            href={etherscanAddressUrl(onChain.contractAddress, true)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Ver contrato verificado (código fuente) ↗
           </a>
           {nftTicket.tx_hash && (
             <a

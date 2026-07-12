@@ -173,23 +173,43 @@ export async function getOperadorBySlug(slug: string) {
   return { operador, listings };
 }
 
+// agencias (tabla base) no tiene SELECT publico por RLS -- el nombre de la
+// agencia se resuelve aparte contra agencias_publico (mismo patron que
+// listings_publico en lib/data/cart.ts), si no el join embebido vuelve
+// null para visitantes anonimos y el Badge se ve vacio.
+async function resolverAgencias<T extends { agencia_id: string }>(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  rows: T[]
+) {
+  const agenciaIds = [...new Set(rows.map((r) => r.agencia_id))];
+  if (agenciaIds.length === 0) return rows.map((r) => ({ ...r, agencias: null }));
+  const { data: agencias } = await supabase
+    .from("agencias_publico")
+    .select("id, razon_social")
+    .in("id", agenciaIds);
+  const porId = new Map((agencias ?? []).map((a) => [a.id, a]));
+  return rows.map((r) => ({ ...r, agencias: porId.get(r.agencia_id) ?? null }));
+}
+
 export async function getPaquetes() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("paquetes")
-    .select("*, agencias(razon_social)")
+    .select("*")
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return data;
+  return resolverAgencias(supabase, data);
 }
 
 export async function getPaqueteBySlug(slug: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("paquetes")
-    .select("*, agencias(razon_social)")
+    .select("*")
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
-  return data;
+  if (!data) return null;
+  const [conAgencia] = await resolverAgencias(supabase, [data]);
+  return conAgencia;
 }

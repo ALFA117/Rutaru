@@ -49,7 +49,7 @@ export function ConversionFunnelChart({
             fontSize: 12,
           }}
         />
-        <Funnel dataKey="cantidad" data={withOpacity} isAnimationActive>
+        <Funnel dataKey="cantidad" data={withOpacity} isAnimationActive={false}>
           <LabelList
             position="right"
             dataKey="etiqueta"
