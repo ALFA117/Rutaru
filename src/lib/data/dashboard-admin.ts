@@ -110,8 +110,16 @@ export async function getAdminDashboardData(rango: RangoFechas = 30) {
     ventasPorDia.set(fecha, (ventasPorDia.get(fecha) ?? 0) + monto);
   }
 
-  const categorias = [...ventasPorCategoria.entries()]
-    .map(([tipo, monto]) => ({ titulo: TIPO_LABEL[tipo] ?? tipo, monto }))
+  // Siempre se muestran todas las categorias del catalogo (barra en $0 si no
+  // hubo ventas en el rango), para que nunca parezca que faltan por un
+  // filtro silencioso. Si aparece un tipo fuera del catalogo (dato inconsistente),
+  // se agrega igual en vez de descartarlo.
+  const tiposAMostrar = new Set([...Object.keys(TIPO_LABEL), ...ventasPorCategoria.keys()]);
+  const categorias = [...tiposAMostrar]
+    .map((tipo) => ({
+      titulo: TIPO_LABEL[tipo] ?? tipo,
+      monto: ventasPorCategoria.get(tipo) ?? 0,
+    }))
     .sort((a, b) => b.monto - a.monto);
 
   const destinos = [...ventasPorDestino.entries()]
