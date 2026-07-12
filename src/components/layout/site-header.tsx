@@ -39,6 +39,12 @@ export async function SiteHeader() {
               {c.titulo}
             </Link>
           ))}
+          <Link
+            href="/articulos"
+            className="text-foreground/80 transition-colors hover:text-foreground"
+          >
+            Artículos
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">

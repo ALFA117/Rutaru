@@ -30,6 +30,7 @@ import {
 import { ListingCard } from "@/components/marketplace/listing-card";
 import type { Listing } from "@/lib/data/listings";
 import { getListingsRelacionados } from "@/lib/data/listings";
+import { getArticulosPorListing } from "@/lib/data/articulos";
 import { DETAIL_HREF } from "@/lib/data/detail-href";
 import type { Database } from "@/types/database.types";
 import { addToCartAction } from "@/lib/cart/actions";
@@ -113,6 +114,7 @@ export async function ListingDetail({
   const pasos = itinerario?.pasos;
   const zonas = itinerario?.zonas;
   const relacionados = await getListingsRelacionados(listing, 4);
+  const articulos = await getArticulosPorListing(listing.id);
   const categoria = CATEGORIA_BREADCRUMB[listing.tipo];
   const proximaSalida = disponibilidad[0]?.fecha;
 
@@ -256,6 +258,27 @@ export async function ListingDetail({
               </a>
             </Button>
           </div>
+
+          {articulos.length > 0 && (
+            <div className="mt-4">
+              <h2 className="mb-3 font-heading text-lg">Artículos</h2>
+              <ul className="flex flex-col gap-3">
+                {articulos.map((a) => (
+                  <li key={a.id}>
+                    <Link
+                      href={`/articulos/${a.slug}`}
+                      className="block rounded-md border border-border p-3 text-sm hover:border-accent"
+                    >
+                      <span className="font-heading text-base">{a.titulo}</span>
+                      {a.extracto && (
+                        <p className="mt-1 text-muted-foreground">{a.extracto}</p>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="mt-4">
             <h2 className="mb-2 font-heading text-lg">Reseñas</h2>
