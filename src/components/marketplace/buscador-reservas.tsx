@@ -201,6 +201,7 @@ function ContadorFila({
           className="h-7 w-7"
           disabled={value <= min}
           onClick={() => onChange(Math.max(min, value - 1))}
+          aria-label={`Restar ${label.toLowerCase()}`}
         >
           <Minus className="h-3.5 w-3.5" />
         </Button>
@@ -211,6 +212,7 @@ function ContadorFila({
           variant="outline"
           className="h-7 w-7"
           onClick={() => onChange(value + 1)}
+          aria-label={`Agregar ${label.toLowerCase()}`}
         >
           <Plus className="h-3.5 w-3.5" />
         </Button>

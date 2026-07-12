@@ -63,6 +63,7 @@ export function ReservaWidget({
             className="h-7 w-7"
             disabled={cantidad <= 1}
             onClick={() => setCantidad((c) => Math.max(1, c - 1))}
+            aria-label={`Restar ${etiquetaCantidad.toLowerCase()}`}
           >
             <Minus className="h-3.5 w-3.5" />
           </Button>
@@ -73,6 +74,7 @@ export function ReservaWidget({
             variant="outline"
             className="h-7 w-7"
             onClick={() => setCantidad((c) => c + 1)}
+            aria-label={`Agregar ${etiquetaCantidad.toLowerCase()}`}
           >
             <Plus className="h-3.5 w-3.5" />
           </Button>

@@ -28,6 +28,7 @@ export function PaqueteReservaWidget({
             className="h-7 w-7"
             disabled={pasajeros <= 1}
             onClick={() => setPasajeros((p) => Math.max(1, p - 1))}
+            aria-label="Restar pasajeros"
           >
             <Minus className="h-3.5 w-3.5" />
           </Button>
@@ -38,6 +39,7 @@ export function PaqueteReservaWidget({
             variant="outline"
             className="h-7 w-7"
             onClick={() => setPasajeros((p) => p + 1)}
+            aria-label="Agregar pasajeros"
           >
             <Plus className="h-3.5 w-3.5" />
           </Button>

@@ -22,6 +22,7 @@ function Calendar({
   locale = es,
   weekStartsOn = 1,
   formatters,
+  labels,
   components,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
@@ -45,6 +46,11 @@ function Calendar({
         formatMonthDropdown: (date) =>
           date.toLocaleString(locale?.code, { month: "short" }),
         ...formatters,
+      }}
+      labels={{
+        labelPrevious: () => "Ir al mes anterior",
+        labelNext: () => "Ir al mes siguiente",
+        ...labels,
       }}
       classNames={{
         root: cn("w-fit", defaultClassNames.root),

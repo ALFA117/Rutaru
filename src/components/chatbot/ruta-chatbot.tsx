@@ -122,7 +122,12 @@ export function RutaChatbot() {
               placeholder="Ej. tengo $4000 para un fin de semana…"
               disabled={loading}
             />
-            <Button type="submit" size="icon" disabled={loading || !input.trim()}>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={loading || !input.trim()}
+              aria-label="Enviar mensaje"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </form>
@@ -133,7 +138,7 @@ export function RutaChatbot() {
         size="icon"
         className="h-11 w-11 rounded-full shadow-lg sm:h-14 sm:w-14"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Abrir chat con Ruta"
+        aria-label={open ? "Cerrar chat con Ruta" : "Abrir chat con Ruta"}
       >
         <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
