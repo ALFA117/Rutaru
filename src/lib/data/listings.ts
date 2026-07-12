@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 
@@ -37,7 +38,7 @@ export async function getListingsByTipo(
   return data;
 }
 
-export async function getListingBySlug(slug: string) {
+export const getListingBySlug = cache(async (slug: string) => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("listings_publico")
@@ -46,7 +47,7 @@ export async function getListingBySlug(slug: string) {
     .maybeSingle();
   if (error) throw error;
   return data;
-}
+});
 
 export async function getCiudadesDisponibles() {
   const supabase = await createClient();
@@ -201,7 +202,7 @@ export async function getPaquetes() {
   return resolverAgencias(supabase, data);
 }
 
-export async function getPaqueteBySlug(slug: string) {
+export const getPaqueteBySlug = cache(async (slug: string) => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("paquetes")
@@ -212,4 +213,4 @@ export async function getPaqueteBySlug(slug: string) {
   if (!data) return null;
   const [conAgencia] = await resolverAgencias(supabase, [data]);
   return conAgencia;
-}
+});

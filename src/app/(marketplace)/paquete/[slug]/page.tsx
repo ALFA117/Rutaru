@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,6 +12,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaqueteReservaWidget } from "@/components/marketplace/paquete-reserva-widget";
 import { formatCurrency } from "@/lib/format";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const paquete = await getPaqueteBySlug(slug);
+  if (!paquete) return {};
+  const componentes = (paquete.componentes as { titulo: string }[] | null) ?? [];
+  const ubicacion = [paquete.ciudad, paquete.estado].filter(Boolean).join(", ");
+  return {
+    title: paquete.titulo,
+    description: `Paquete de ${componentes.length} componentes${
+      ubicacion ? ` en ${ubicacion}` : ""
+    } armado por ${paquete.agencias?.razon_social ?? "una agencia Rutaru"}.`,
+  };
+}
 
 const fecha = new Intl.DateTimeFormat("es-MX", {
   day: "numeric",

@@ -25,7 +25,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rutaru — pocas rutas, todas buenas.",
+  title: {
+    default: "Rutaru — pocas rutas, todas buenas.",
+    template: "%s — Rutaru",
+  },
   description:
     "Marketplace de rutas, hospedaje, traslados y eventos. Conexión de inventario turístico B2B/B2C.",
 };

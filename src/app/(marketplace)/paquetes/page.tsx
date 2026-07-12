@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PackageSearch } from "lucide-react";
 import { getPaquetes } from "@/lib/data/listings";
@@ -6,6 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { addToCartAction } from "@/lib/cart/actions";
 import { formatCurrency } from "@/lib/format";
+
+export const metadata: Metadata = {
+  title: "Paquetes de Agencia",
+  description: "Todo incluido, armado por agencias.",
+};
 
 export default async function PaquetesPage() {
   const paquetes = await getPaquetes();
