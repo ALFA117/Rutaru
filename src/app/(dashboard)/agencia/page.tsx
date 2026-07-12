@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Boxes, ReceiptText } from "lucide-react";
 import { requireRole } from "@/lib/auth/guards";
 import { getAgenciaDashboardData } from "@/lib/data/dashboard-agencia";
 import { StatTile } from "@/components/dashboard/stat-tile";
@@ -128,9 +129,13 @@ export default async function AgenciaPage() {
           </CardHeader>
           <CardContent>
             {allotments.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                Aún no has comprado bloques B2B.
-              </p>
+              <div className="flex flex-col items-center gap-3 py-8 text-center text-sm text-muted-foreground">
+                <Boxes className="h-8 w-8" />
+                <p>Aún no has comprado bloques B2B.</p>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/agencia/catalogo">Ver catálogo B2B</Link>
+                </Button>
+              </div>
             ) : (
               <ul className="flex flex-col divide-y divide-border">
                 {allotments.map((a) => (
@@ -153,9 +158,13 @@ export default async function AgenciaPage() {
           </CardHeader>
           <CardContent>
             {ordenesB2B.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                Aún no has comprado bloques al mayoreo.
-              </p>
+              <div className="flex flex-col items-center gap-3 py-8 text-center text-sm text-muted-foreground">
+                <ReceiptText className="h-8 w-8" />
+                <p>Aún no has comprado bloques al mayoreo.</p>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/agencia/catalogo">Ver catálogo B2B</Link>
+                </Button>
+              </div>
             ) : (
               <ul className="flex flex-col divide-y divide-border">
                 {ordenesB2B.map((o) => (

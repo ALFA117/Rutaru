@@ -59,7 +59,7 @@ async function ensureUser(email, role, nombre) {
   return data.user.id;
 }
 
-async function ensureOperador({ userId, tipo, descripcion, logo, slug }) {
+async function ensureOperador({ userId, tipo, nombre, descripcion, logo, slug }) {
   const { data: existing } = await admin
     .from("operadores")
     .select("id")
@@ -69,7 +69,7 @@ async function ensureOperador({ userId, tipo, descripcion, logo, slug }) {
 
   const { data, error } = await admin
     .from("operadores")
-    .insert({ user_id: userId, tipo, descripcion, logo, slug })
+    .insert({ user_id: userId, tipo, nombre, descripcion, logo, slug })
     .select("id")
     .single();
   if (error) throw new Error(`operador ${slug}: ${error.message}`);
@@ -471,24 +471,28 @@ async function main() {
   const operadorRutas = await ensureOperador({
     userId: rutasUserId,
     tipo: "tour",
+    nombre: "Rutaru Tours",
     descripcion: "Rutas y tours de autor.",
     slug: "rutaru-tours",
   });
   const operadorHoteles = await ensureOperador({
     userId: hotelesUserId,
     tipo: "hotel",
+    nombre: "Hoteles Rutaru",
     descripcion: "Hospedajes estilo Airbnb en todo México.",
     slug: "rutaru-hospedaje",
   });
   const operadorTraslados = await ensureOperador({
     userId: traslsUserId,
     tipo: "transporte",
+    nombre: "Traslados Rutaru",
     descripcion: "Traslados privados y compartidos.",
     slug: "rutaru-traslados",
   });
   const operadorEventos = await ensureOperador({
     userId: eventosUserId,
     tipo: "evento",
+    nombre: "Eventos Rutaru",
     descripcion: "Boletaje de eventos y festivales.",
     slug: "rutaru-eventos",
   });
@@ -501,14 +505,14 @@ async function main() {
     markup: 15,
   });
 
-  const afiliadoId1 = await ensureAfiliado({
+  await ensureAfiliado({
     userId: (
       await admin.from("profiles").select("id").eq("email", "afiliado@rutaru.demo").single()
     ).data.id,
     codigo5: "RUTA5",
     codigo10: "RUTA10",
   });
-  const afiliadoId2 = await ensureAfiliado({
+  await ensureAfiliado({
     userId: afiliado2UserId,
     codigo5: "VIAJA5",
     codigo10: "VIAJA10",

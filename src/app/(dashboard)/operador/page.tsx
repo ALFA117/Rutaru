@@ -1,3 +1,4 @@
+import { CalendarClock, ShieldCheck } from "lucide-react";
 import { requireRole } from "@/lib/auth/guards";
 import { getOperadorDashboardData } from "@/lib/data/dashboard-operador";
 import { getReservasBlockchainPendientes } from "@/lib/data/dashboard-operador-blockchain";
@@ -119,9 +120,10 @@ export default async function OperadorPage() {
         </CardHeader>
         <CardContent>
           {reservasProximas.length === 0 ? (
-            <p className="py-4 text-sm text-muted-foreground">
-              No hay reservas con fecha próxima todavía.
-            </p>
+            <div className="flex flex-col items-center gap-2 py-6 text-center text-sm text-muted-foreground">
+              <CalendarClock className="h-6 w-6" />
+              <p>No hay reservas con fecha próxima todavía.</p>
+            </div>
           ) : (
             <ul className="flex flex-col divide-y divide-border">
               {reservasProximas.map((r) => (
@@ -153,9 +155,10 @@ export default async function OperadorPage() {
             </CardHeader>
             <CardContent>
               {reservasBlockchain.length === 0 ? (
-                <p className="py-4 text-sm text-muted-foreground">
-                  No hay reservas en escrow esperando confirmación.
-                </p>
+                <div className="flex flex-col items-center gap-2 py-6 text-center text-sm text-muted-foreground">
+                  <ShieldCheck className="h-6 w-6" />
+                  <p>No hay reservas en escrow esperando confirmación.</p>
+                </div>
               ) : (
                 <ul className="flex flex-col divide-y divide-border">
                   {reservasBlockchain.map((r) => (

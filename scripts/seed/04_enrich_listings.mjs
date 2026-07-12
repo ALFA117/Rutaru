@@ -220,7 +220,7 @@ async function ensureUser(email, role, nombre) {
   return data.user.id;
 }
 
-async function ensureOperador({ userId, tipo, descripcion, slug }) {
+async function ensureOperador({ userId, tipo, nombre, descripcion, slug }) {
   const { data: existing } = await admin
     .from("operadores")
     .select("id")
@@ -230,7 +230,7 @@ async function ensureOperador({ userId, tipo, descripcion, slug }) {
 
   const { data, error } = await admin
     .from("operadores")
-    .insert({ user_id: userId, tipo, descripcion, slug })
+    .insert({ user_id: userId, tipo, nombre, descripcion, slug })
     .select("id")
     .single();
   if (error) throw new Error(`operador ${slug}: ${error.message}`);
@@ -465,6 +465,7 @@ async function main() {
   const operadorExperiencias = await ensureOperador({
     userId: experienciasUserId,
     tipo: "tour",
+    nombre: "Experiencias Rutaru",
     descripcion: "Experiencias y actividades únicas.",
     slug: "rutaru-experiencias",
   });

@@ -56,6 +56,7 @@ export type Database = {
           id: string;
           user_id: string;
           tipo: string;
+          nombre: string | null;
           descripcion: string | null;
           logo: string | null;
           slug: string;
@@ -67,6 +68,7 @@ export type Database = {
           id?: string;
           user_id: string;
           tipo: string;
+          nombre?: string | null;
           descripcion?: string | null;
           logo?: string | null;
           slug: string;

@@ -155,7 +155,7 @@ export async function getListingsRelacionados(
   return data;
 }
 
-export async function getOperadorBySlug(slug: string) {
+export const getOperadorBySlug = cache(async (slug: string) => {
   const supabase = await createClient();
   const { data: operador, error } = await supabase
     .from("operadores")
@@ -172,7 +172,7 @@ export async function getOperadorBySlug(slug: string) {
   if (listingsError) throw listingsError;
 
   return { operador, listings };
-}
+});
 
 // agencias (tabla base) no tiene SELECT publico por RLS -- el nombre de la
 // agencia se resuelve aparte contra agencias_publico (mismo patron que

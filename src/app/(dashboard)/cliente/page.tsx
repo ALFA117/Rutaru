@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Luggage } from "lucide-react";
 import { requireRole } from "@/lib/auth/guards";
 import { getMisViajes } from "@/lib/data/dashboard-cliente";
 import { getParaTiListings } from "@/lib/data/recommendations";
@@ -55,9 +57,13 @@ export default async function ClientePage() {
         </CardHeader>
         <CardContent>
           {viajes.length === 0 ? (
-            <p className="py-8 text-center text-muted-foreground">
-              Aún no tienes compras.
-            </p>
+            <div className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
+              <Luggage className="h-10 w-10" />
+              <p>Aún no tienes compras.</p>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/rutas">Explorar rutas</Link>
+              </Button>
+            </div>
           ) : (
             <ul className="flex flex-col divide-y divide-border">
               {viajes.map((orden) => (
