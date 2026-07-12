@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { fetchAllRows } from "@/lib/supabase/paginate";
 
 const FUNNEL_ORDEN: { tipo: string; etiqueta: string }[] = [
   { tipo: "page_view", etiqueta: "Vieron un listing" },
@@ -31,13 +32,15 @@ export async function getAdminDashboardData(rango: RangoFechas = 30) {
   const supabase = await createClient();
   const desde = fechaDesde(rango);
 
-  // Sin .limit() explicito, PostgREST tope por defecto en 1000 filas --
-  // events_tracking ya lo supera facil en el rango de 30/90 dias.
-  let eventosQuery = supabase
-    .from("events_tracking")
-    .select("tipo_evento, created_at")
-    .limit(20000);
-  if (desde) eventosQuery = eventosQuery.gte("created_at", desde);
+  // events_tracking ya supera el tope de filas por respuesta del proyecto
+  // (1000, a nivel Supabase, .limit() del cliente no lo pasa) -- se pagina.
+  const eventosPromise = fetchAllRows<{ tipo_evento: string; created_at: string }>(
+    (from, to) => {
+      let q = supabase.from("events_tracking").select("tipo_evento, created_at").range(from, to);
+      if (desde) q = q.gte("created_at", desde);
+      return q;
+    }
+  );
 
   let ordenItemsQuery = supabase
     .from("orden_items")
@@ -47,9 +50,9 @@ export async function getAdminDashboardData(rango: RangoFechas = 30) {
     .eq("ordenes.estado", "pagada");
   if (desde) ordenItemsQuery = ordenItemsQuery.gte("ordenes.created_at", desde);
 
-  const [{ data: eventos }, { data: ordenItems }, { data: comisiones }] =
+  const [eventos, { data: ordenItems }, { data: comisiones }] =
     await Promise.all([
-      eventosQuery,
+      eventosPromise,
       ordenItemsQuery,
       supabase.from("comisiones_afiliado").select("monto, afiliado_id"),
     ]);

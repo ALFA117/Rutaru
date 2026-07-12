@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fetchAllRows } from "@/lib/supabase/paginate";
 import type { MetricaId } from "@/lib/data/data-packages-metricas-tipos";
 
 export type { MetricaId } from "@/lib/data/data-packages-metricas-tipos";
@@ -79,8 +80,11 @@ async function tendenciasPorTemporada() {
 
 async function funnelConversion() {
   const supabase = await createClient();
-  // Sin .limit(), PostgREST tope en 1000 filas por defecto.
-  const { data } = await supabase.from("events_tracking").select("tipo_evento").limit(20000);
+  // events_tracking supera el tope de filas por respuesta del proyecto
+  // (1000) -- se pagina, .limit() del cliente no lo pasa.
+  const data = await fetchAllRows<{ tipo_evento: string }>((from, to) =>
+    supabase.from("events_tracking").select("tipo_evento").range(from, to)
+  );
   const counts = new Map<string, number>();
   for (const e of data ?? []) {
     counts.set(e.tipo_evento, (counts.get(e.tipo_evento) ?? 0) + 1);
