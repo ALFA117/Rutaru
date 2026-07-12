@@ -35,7 +35,6 @@ import { getListingsRelacionados } from "@/lib/data/listings";
 import { getArticulosPorListing } from "@/lib/data/articulos";
 import { DETAIL_HREF } from "@/lib/data/detail-href";
 import type { Database } from "@/types/database.types";
-import { addToCartAction } from "@/lib/cart/actions";
 import { track } from "@/lib/tracking/track";
 
 type Disponibilidad = Database["public"]["Tables"]["disponibilidad"]["Row"];
@@ -321,39 +320,12 @@ export async function ListingDetail({
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            {listing.tipo === "evento" ? (
-              <>
-                {disponibilidad.length > 0 ? (
-                  <div>
-                    <p className="mb-2 text-sm font-medium">Próximas fechas</p>
-                    <div className="flex flex-wrap gap-2">
-                      {disponibilidad.slice(0, 6).map((d) => (
-                        <Badge key={d.id} variant="outline">
-                          {fecha.format(new Date(`${d.fecha}T00:00:00`))}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Consulta disponibilidad directamente.
-                  </p>
-                )}
-                <form action={addToCartAction}>
-                  <input type="hidden" name="listingId" value={listing.id} />
-                  <Button size="lg" type="submit" className="w-full">
-                    Agregar al carrito
-                  </Button>
-                </form>
-              </>
-            ) : (
-              <ReservaWidget
-                listingId={listing.id}
-                tipo={listing.tipo}
-                precioB2c={listing.precio_b2c}
-                disponibilidad={disponibilidad}
-              />
-            )}
+            <ReservaWidget
+              listingId={listing.id}
+              tipo={listing.tipo}
+              precioB2c={listing.precio_b2c}
+              disponibilidad={disponibilidad}
+            />
           </CardContent>
         </Card>
       </div>

@@ -29,7 +29,8 @@ export function ReservaWidget({
   const [fecha, setFecha] = useState<Date | undefined>();
   const [cantidad, setCantidad] = useState(1);
 
-  const etiquetaCantidad = tipo === "hospedaje" ? "Habitaciones" : "Pasajeros";
+  const etiquetaCantidad =
+    tipo === "hospedaje" ? "Habitaciones" : tipo === "evento" ? "Boletos" : "Pasajeros";
   const total = precioB2c * cantidad;
   const fechaIso = fecha ? format(fecha, "yyyy-MM-dd") : "";
 
