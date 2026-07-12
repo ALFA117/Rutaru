@@ -142,15 +142,15 @@ PRIVY_APP_SECRET=               # dashboard.privy.io -> app -> App Secret (nunca
 
 `npm run fund:check` verifica el balance de la wallet de deploy sin exponer la llave. Conexión de wallet vía **Privy** (`@privy-io/react-auth` + `@privy-io/wagmi`) — soporta MetaMask (wallet externa) y login embebido por email/Google, útil para que alguien sin wallet propia pruebe el flujo Web3. Configurado para Sepolia únicamente (`defaultChain`/`supportedChains`).
 
-### 3. Contratos ya desplegados en Sepolia real
+### 3. Contratos ya desplegados y verificados en Sepolia real
 
-| Contrato | Dirección | Etherscan |
+| Contrato | Dirección | Etherscan (código fuente verificado ✅) |
 |---|---|---|
-| `RutaruTicket` (NFT-ticket) | `0x2eE1d7432DE8E722F5b7597F907aC53b45Ab4aFD` | [ver ↗](https://sepolia.etherscan.io/address/0x2eE1d7432DE8E722F5b7597F907aC53b45Ab4aFD) |
-| `RutaruBooking` (escrow) | `0x81B600E7ACE4CEe5D698C39368B615A732d0E9f8` | [ver ↗](https://sepolia.etherscan.io/address/0x81B600E7ACE4CEe5D698C39368B615A732d0E9f8) |
-| `RutaruAffiliate` (comisiones) | `0x7A237323C37B1bdf32Af7d759078c98866479a0c` | [ver ↗](https://sepolia.etherscan.io/address/0x7A237323C37B1bdf32Af7d759078c98866479a0c) |
+| `RutaruTicket` (NFT-ticket) | `0x2eE1d7432DE8E722F5b7597F907aC53b45Ab4aFD` | [ver código ↗](https://sepolia.etherscan.io/address/0x2eE1d7432DE8E722F5b7597F907aC53b45Ab4aFD#code) |
+| `RutaruBooking` (escrow) | `0x81B600E7ACE4CEe5D698C39368B615A732d0E9f8` | [ver código ↗](https://sepolia.etherscan.io/address/0x81B600E7ACE4CEe5D698C39368B615A732d0E9f8#code) |
+| `RutaruAffiliate` (comisiones) | `0x7A237323C37B1bdf32Af7d759078c98866479a0c` | [ver código ↗](https://sepolia.etherscan.io/address/0x7A237323C37B1bdf32Af7d759078c98866479a0c#code) |
 
-Address+ABI en `src/lib/blockchain/deployments/sepolia.json`. Para re-desplegar: `cd contracts && npx hardhat run scripts/deploy.ts --network sepolia`.
+Address+ABI en `src/lib/blockchain/deployments/sepolia.json`. Para re-desplegar: `cd contracts && npx hardhat run scripts/deploy.ts --network sepolia`. Para re-verificar: `cd contracts && npx hardhat verify --network sepolia <address> <constructor-arg>` (requiere `ETHERSCAN_API_KEY`).
 
 ### 4. Probar el flujo completo
 

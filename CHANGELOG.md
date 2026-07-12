@@ -116,7 +116,9 @@ Migración `0021`: `profiles.consentimiento_hash`/`consentimiento_tx_hash`. El b
 Migración `0021` (`afiliados`/`operadores.wallet_address`) y `0023` (`ordenes.reserva_id_blockchain`, liga la orden con la reserva on-chain para poder liberarla/cancelarla). Dashboard de operador: reservas blockchain pendientes con botones "Marcar completado"/"Cancelar y reembolsar" (verifica que la orden pertenezca al operador antes de tocar el contrato). Afiliado y operador pueden configurar su wallet de recepción.
 
 ### Bloque 9 — Verificación pública + cierre
-`/verificar/[tokenId]`: lee `ownerOf`/`tokenURI` directo del contrato (lectura pública, sin llave privada) + QR de verificación. Migración `0022`: lectura pública de `nft_tickets` (ya son públicos por naturaleza, cualquiera puede consultarlos en Etherscan). Smoke test end-to-end en Sepolia real (crearReserva → mintTicket con verificación de lectura pública → completarServicio → pagarComision), 4 transacciones confirmadas — links en el resumen del cierre.
+`/verificar/[tokenId]`: lee `ownerOf`/`tokenURI` directo del contrato (lectura pública, sin llave privada) + QR de verificación. Migración `0022`: lectura pública de `nft_tickets` (ya son públicos por naturaleza, cualquiera puede consultarlos en Etherscan). Smoke test end-to-end en Sepolia real (crearReserva → mintTicket con verificación de lectura pública → completarServicio → pagarComision), 4 transacciones confirmadas — links en el resumen del cierre. Verificado con Privy: compra con cripto end-to-end contra `api/checkout/crypto` real (orden `estado='confirmada'`, NFT minteado, comisión pendiente por falta de wallet del afiliado), `/verificar/[tokenId]` renderizando datos on-chain reales.
+
+**Código fuente verificado en Etherscan** (`npx hardhat verify`) para los 3 contratos — ver tabla de direcciones en el README.
 
 ---
 
