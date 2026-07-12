@@ -21,7 +21,7 @@ export function MobileNav({ categorias }: { categorias: Categoria[] }) {
         <Button
           variant="outline"
           size="icon"
-          className="h-11 w-11 md:hidden"
+          className="h-11 w-11 lg:hidden"
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
         >
           <Menu className="h-5 w-5" />

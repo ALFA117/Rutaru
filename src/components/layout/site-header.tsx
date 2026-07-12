@@ -6,6 +6,7 @@ import { CATEGORIAS } from "@/lib/data/categorias";
 import { BLOCKCHAIN_ENABLED } from "@/config/flags";
 import { ConnectWalletButton } from "@/components/blockchain/connect-wallet-button";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { NavLink } from "@/components/layout/nav-link";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -30,25 +31,16 @@ export async function SiteHeader() {
           Rutaru
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm md:flex">
+        <nav className="hidden h-full shrink-0 items-center gap-5 self-stretch text-sm lg:flex">
           {CATEGORIAS.slice(0, 5).map((c) => (
-            <Link
-              key={c.href}
-              href={c.href}
-              className="text-foreground/80 transition-colors hover:text-foreground"
-            >
+            <NavLink key={c.href} href={c.href}>
               {c.titulo}
-            </Link>
+            </NavLink>
           ))}
-          <Link
-            href="/articulos"
-            className="text-foreground/80 transition-colors hover:text-foreground"
-          >
-            Artículos
-          </Link>
+          <NavLink href="/articulos">Artículos</NavLink>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           {BLOCKCHAIN_ENABLED && <ConnectWalletButton />}
           <Button asChild size="sm" className="min-h-11">
             <Link href={accountHref}>{user ? "Mi cuenta" : "Iniciar sesión"}</Link>
