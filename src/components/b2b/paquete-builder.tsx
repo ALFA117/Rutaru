@@ -2,6 +2,7 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { crearPaqueteAction, type CrearPaqueteState } from "@/lib/b2b/actions-paquetes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -291,7 +292,7 @@ export function PaqueteBuilder({ catalogo }: { catalogo: ListingOpcion[] }) {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start font-normal">
                     <CalendarIcon className="h-4 w-4" />
-                    {fechaInicio ? format(fechaInicio, "d MMM") : "Elegir"}
+                    {fechaInicio ? format(fechaInicio, "d MMM", { locale: es }) : "Elegir"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -311,7 +312,7 @@ export function PaqueteBuilder({ catalogo }: { catalogo: ListingOpcion[] }) {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start font-normal">
                     <CalendarIcon className="h-4 w-4" />
-                    {fechaFin ? format(fechaFin, "d MMM") : "Elegir"}
+                    {fechaFin ? format(fechaFin, "d MMM", { locale: es }) : "Elegir"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
