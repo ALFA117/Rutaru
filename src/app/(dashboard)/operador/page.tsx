@@ -61,7 +61,11 @@ export default async function OperadorPage() {
       </div>
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatTile label="Ventas totales" value={currency.format(totales.totalVentas)} />
+        <StatTile
+          label="Ventas totales"
+          value={currency.format(totales.totalVentas)}
+          trend={ventas.slice(-14).map((v) => v.monto)}
+        />
         <StatTile label="Reservas" value={String(totales.totalReservas)} />
         <StatTile
           label="Ticket promedio"

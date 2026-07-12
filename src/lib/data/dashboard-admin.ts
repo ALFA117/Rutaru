@@ -16,21 +16,39 @@ const TIPO_LABEL: Record<string, string> = {
   paquete: "Paquetes",
 };
 
-export async function getAdminDashboardData() {
+const DIA_LABEL = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+export type RangoFechas = 7 | 30 | 90 | "todo";
+
+function fechaDesde(rango: RangoFechas): string | null {
+  if (rango === "todo") return null;
+  const d = new Date();
+  d.setDate(d.getDate() - rango);
+  return d.toISOString();
+}
+
+export async function getAdminDashboardData(rango: RangoFechas = 30) {
   const supabase = await createClient();
+  const desde = fechaDesde(rango);
+
+  let eventosQuery = supabase
+    .from("events_tracking")
+    .select("tipo_evento, created_at");
+  if (desde) eventosQuery = eventosQuery.gte("created_at", desde);
+
+  let ordenItemsQuery = supabase
+    .from("orden_items")
+    .select(
+      "cantidad, precio, listing_id, paquete_id, listings(titulo, tipo, ubicacion), ordenes!inner(estado, created_at)"
+    )
+    .eq("ordenes.estado", "pagada");
+  if (desde) ordenItemsQuery = ordenItemsQuery.gte("ordenes.created_at", desde);
 
   const [{ data: eventos }, { data: ordenItems }, { data: comisiones }] =
     await Promise.all([
-      supabase.from("events_tracking").select("tipo_evento"),
-      supabase
-        .from("orden_items")
-        .select(
-          "cantidad, precio, listing_id, paquete_id, listings(tipo, ubicacion), ordenes!inner(estado)"
-        )
-        .eq("ordenes.estado", "pagada"),
-      supabase
-        .from("comisiones_afiliado")
-        .select("monto, afiliado_id"),
+      eventosQuery,
+      ordenItemsQuery,
+      supabase.from("comisiones_afiliado").select("monto, afiliado_id"),
     ]);
 
   const funnelCounts = new Map<string, number>();
@@ -42,8 +60,28 @@ export async function getAdminDashboardData() {
     cantidad: funnelCounts.get(f.tipo) ?? 0,
   }));
 
+  // Heatmap de actividad: dia de la semana x hora, a partir de events_tracking
+  const heatmap: { dia: string; hora: number; cantidad: number }[] = [];
+  const heatmapCounts = new Map<string, number>();
+  for (const e of eventos ?? []) {
+    const d = new Date(e.created_at);
+    const key = `${d.getDay()}-${d.getHours()}`;
+    heatmapCounts.set(key, (heatmapCounts.get(key) ?? 0) + 1);
+  }
+  for (let dia = 0; dia < 7; dia++) {
+    for (let hora = 0; hora < 24; hora++) {
+      heatmap.push({
+        dia: DIA_LABEL[dia],
+        hora,
+        cantidad: heatmapCounts.get(`${dia}-${hora}`) ?? 0,
+      });
+    }
+  }
+
   const ventasPorCategoria = new Map<string, number>();
   const ventasPorDestino = new Map<string, number>();
+  const ventasPorListing = new Map<string, { titulo: string; monto: number }>();
+  const ventasPorDia = new Map<string, number>();
   let totalVentas = 0;
 
   for (const item of ordenItems ?? []) {
@@ -56,6 +94,20 @@ export async function getAdminDashboardData() {
     if (destino) {
       ventasPorDestino.set(destino, (ventasPorDestino.get(destino) ?? 0) + monto);
     }
+
+    if (item.listing_id && item.listings?.titulo) {
+      const actual = ventasPorListing.get(item.listing_id);
+      ventasPorListing.set(item.listing_id, {
+        titulo: item.listings.titulo,
+        monto: (actual?.monto ?? 0) + monto,
+      });
+    }
+
+    const fecha = (item.ordenes as unknown as { created_at: string }).created_at.slice(
+      0,
+      10
+    );
+    ventasPorDia.set(fecha, (ventasPorDia.get(fecha) ?? 0) + monto);
   }
 
   const categorias = [...ventasPorCategoria.entries()]
@@ -66,6 +118,14 @@ export async function getAdminDashboardData() {
     .map(([titulo, monto]) => ({ titulo, monto }))
     .sort((a, b) => b.monto - a.monto)
     .slice(0, 5);
+
+  const topListings = [...ventasPorListing.values()]
+    .sort((a, b) => b.monto - a.monto)
+    .slice(0, 5);
+
+  const serieVentas = [...ventasPorDia.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([fecha, monto]) => ({ fecha, monto }));
 
   const comisionesPorAfiliado = new Map<string, number>();
   for (const c of comisiones ?? []) {
@@ -107,6 +167,9 @@ export async function getAdminDashboardData() {
     categorias,
     destinos,
     topAfiliados,
+    topListings,
+    heatmap,
+    serieVentas,
     totales: {
       totalVentas,
       totalEventos: eventos?.length ?? 0,

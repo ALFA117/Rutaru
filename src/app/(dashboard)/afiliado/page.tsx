@@ -88,6 +88,7 @@ export default async function AfiliadoPage() {
           label="Comisiones"
           value={currency.format(totales.totalComisiones)}
           hint={`${currency.format(totales.comisionesPendientes)} pendientes`}
+          trend={serieComisiones.slice(-14).map((v) => v.monto)}
         />
       </div>
 
