@@ -2,6 +2,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import { IMAGENES_POR_SLUG } from "./imagenes-reales.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, "..", "..", ".env.local") });
@@ -143,7 +144,7 @@ async function ensureListing(operadorId, listing) {
       moneda: "MXN",
       duracion: listing.duracion,
       ubicacion: listing.ubicacion,
-      imagenes: img(listing.slug, 3),
+      imagenes: IMAGENES_POR_SLUG[listing.slug] ?? img(listing.slug, 3),
       cupo: listing.cupo ?? 20,
       activo: true,
     })
