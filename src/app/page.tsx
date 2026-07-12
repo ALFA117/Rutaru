@@ -1,38 +1,40 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ListingCard } from "@/components/marketplace/listing-card";
+import { HeroCarousel, type HeroSlide } from "@/components/marketplace/hero-carousel";
+import { BuscadorReservas } from "@/components/marketplace/buscador-reservas";
 import { CATEGORIAS } from "@/lib/data/categorias";
-import { getFeaturedListings } from "@/lib/data/listings";
+import { getFeaturedListings, getCiudadesDisponibles } from "@/lib/data/listings";
 import { DETAIL_HREF } from "@/lib/data/detail-href";
 
 export default async function Home() {
-  const destacados = await getFeaturedListings(6);
+  const [destacados, ciudades] = await Promise.all([
+    getFeaturedListings(8),
+    getCiudadesDisponibles(),
+  ]);
+
+  const slides: HeroSlide[] = destacados
+    .filter((l) => l.imagenes?.[0])
+    .slice(0, 6)
+    .map((l) => ({
+      id: l.id,
+      titulo: l.titulo,
+      imagen: l.imagenes[0],
+      precio: l.precio_b2c,
+      duracion: l.duracion,
+      tipo: l.tipo,
+      href: DETAIL_HREF[l.tipo]?.(l.slug) ?? "/",
+    }));
 
   return (
     <div className="flex flex-1 flex-col">
-      <section className="border-b border-border/60 bg-background px-4 py-24 md:py-32">
-        <div className="mx-auto flex max-w-4xl flex-col items-start gap-6">
-          <h1 className="font-heading text-5xl leading-[1.05] tracking-tight md:text-7xl">
-            pocas rutas,
-            <br />
-            todas buenas.
-          </h1>
-          <p className="max-w-xl text-lg text-muted-foreground">
-            Rutas de autor, hospedaje, traslados y eventos — la plataforma que
-            conecta operadores turísticos con agencias y viajeros.
-          </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button asChild size="lg">
-              <Link href="/rutas">Explorar rutas</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/paquetes">Ver paquetes</Link>
-            </Button>
-          </div>
+      <section className="relative">
+        <HeroCarousel slides={slides} />
+        <div className="px-4">
+          <BuscadorReservas ciudades={ciudades} />
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-16">
+      <section className="mx-auto w-full max-w-6xl px-4 pt-20 pb-16">
         <h2 className="mb-8 font-heading text-2xl">Categorías</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {CATEGORIAS.map((c) => (

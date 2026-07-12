@@ -48,6 +48,17 @@ export async function getListingBySlug(slug: string) {
   return data;
 }
 
+export async function getCiudadesDisponibles() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("listings_publico")
+    .select("ciudad")
+    .not("ciudad", "is", null);
+  if (error) throw error;
+  const ciudades = [...new Set((data ?? []).map((d) => d.ciudad as string))];
+  return ciudades.sort((a, b) => a.localeCompare(b));
+}
+
 export async function getFeaturedListings(limit = 6) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -81,6 +92,50 @@ export async function getResenas(listingId: string) {
     .order("created_at", { ascending: false });
   if (error) throw error;
   return data;
+}
+
+export type BuscarParams = {
+  tipo: ListingTipo | "paquete";
+  destino?: string;
+  entrada?: string;
+};
+
+export async function buscarListings(params: BuscarParams) {
+  const supabase = await createClient();
+
+  if (params.tipo === "paquete") {
+    let query = supabase.from("paquetes").select("*, agencias(razon_social)");
+    if (params.destino) query = query.ilike("titulo", `%${params.destino}%`);
+    const { data, error } = await query.order("created_at", { ascending: false });
+    if (error) throw error;
+    return { paquetes: data, listings: null as never };
+  }
+
+  let query = supabase.from("listings_publico").select("*").eq("tipo", params.tipo);
+  if (params.destino) {
+    query = query.or(
+      `ciudad.ilike.%${params.destino}%,estado.ilike.%${params.destino}%,ubicacion.ilike.%${params.destino}%`
+    );
+  }
+  const { data: listings, error } = await query.order("created_at", { ascending: false });
+  if (error) throw error;
+
+  if (!params.entrada || !listings || listings.length === 0) {
+    return { listings, paquetes: null as never };
+  }
+
+  const { data: disponibles } = await supabase
+    .from("disponibilidad")
+    .select("listing_id")
+    .in(
+      "listing_id",
+      listings.map((l) => l.id)
+    )
+    .gte("fecha", params.entrada)
+    .gt("cupo_disponible", 0);
+
+  const idsConCupo = new Set((disponibles ?? []).map((d) => d.listing_id));
+  return { listings: listings.filter((l) => idsConCupo.has(l.id)), paquetes: null as never };
 }
 
 export async function getListingsRelacionados(
