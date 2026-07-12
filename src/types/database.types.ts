@@ -159,6 +159,12 @@ export type Database = {
           slug: string;
           descripcion: string | null;
           itinerario: Json;
+          que_incluye: string[];
+          cancelaciones: string | null;
+          dificultad: string | null;
+          pais: string | null;
+          estado: string | null;
+          ciudad: string | null;
           precio_b2c: number;
           precio_neto_b2b: number | null;
           moneda: string;
@@ -180,6 +186,12 @@ export type Database = {
           slug: string;
           descripcion?: string | null;
           itinerario?: Json;
+          que_incluye?: string[];
+          cancelaciones?: string | null;
+          dificultad?: string | null;
+          pais?: string | null;
+          estado?: string | null;
+          ciudad?: string | null;
           precio_b2c: number;
           precio_neto_b2b?: number | null;
           moneda?: string;
@@ -636,6 +648,45 @@ export type Database = {
           },
         ];
       };
+      articulos: {
+        Row: {
+          id: string;
+          titulo: string;
+          slug: string;
+          extracto: string | null;
+          contenido: string;
+          imagen: string | null;
+          categoria: string | null;
+          listing_id: string | null;
+          autor: string | null;
+          publicado_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          titulo: string;
+          slug: string;
+          extracto?: string | null;
+          contenido: string;
+          imagen?: string | null;
+          categoria?: string | null;
+          listing_id?: string | null;
+          autor?: string | null;
+          publicado_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["articulos"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "articulos_listing_id_fkey";
+            columns: ["listing_id"];
+            referencedRelation: "listings";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       listings_publico: {
@@ -647,6 +698,12 @@ export type Database = {
           slug: string;
           descripcion: string | null;
           itinerario: Json;
+          que_incluye: string[];
+          cancelaciones: string | null;
+          dificultad: string | null;
+          pais: string | null;
+          estado: string | null;
+          ciudad: string | null;
           precio_b2c: number;
           moneda: string;
           duracion: string | null;

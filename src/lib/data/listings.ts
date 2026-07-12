@@ -83,6 +83,22 @@ export async function getResenas(listingId: string) {
   return data;
 }
 
+export async function getListingsRelacionados(
+  listing: Pick<Listing, "id" | "tipo">,
+  limit = 4
+) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("listings_publico")
+    .select("*")
+    .eq("tipo", listing.tipo)
+    .neq("id", listing.id)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data;
+}
+
 export async function getOperadorBySlug(slug: string) {
   const supabase = await createClient();
   const { data: operador, error } = await supabase

@@ -1,4 +1,24 @@
 import Image from "next/image";
+import Link from "next/link";
+import {
+  Bus,
+  Car,
+  UserCheck,
+  Ticket,
+  Coffee,
+  Droplet,
+  Shield,
+  Wifi,
+  UtensilsCrossed,
+  BedDouble,
+  Clock,
+  Backpack,
+  Plane,
+  Camera,
+  Lock,
+  MessageCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,7 +27,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ListingCard } from "@/components/marketplace/listing-card";
 import type { Listing } from "@/lib/data/listings";
+import { getListingsRelacionados } from "@/lib/data/listings";
+import { DETAIL_HREF } from "@/lib/data/detail-href";
 import type { Database } from "@/types/database.types";
 import { addToCartAction } from "@/lib/cart/actions";
 import { track } from "@/lib/tracking/track";
@@ -27,6 +50,49 @@ const fecha = new Intl.DateTimeFormat("es-MX", {
 });
 
 type Zona = { nombre: string; precio: number };
+type Paso = { hora: string; titulo: string; descripcion: string };
+type Itinerario = { pasos?: Paso[]; zonas?: Zona[] };
+
+const TIPO_BADGE: Record<string, string> = {
+  ruta: "Ruta Abierta",
+  hospedaje: "Hospedaje",
+  traslado: "Traslado",
+  evento: "Evento",
+  experiencia: "Experiencia",
+};
+
+const CATEGORIA_BREADCRUMB: Record<string, { titulo: string; href: string }> = {
+  ruta: { titulo: "Rutas y Tours", href: "/rutas" },
+  hospedaje: { titulo: "Hospedaje", href: "/hospedaje" },
+  traslado: { titulo: "Traslados y Movilidad", href: "/traslados" },
+  evento: { titulo: "Eventos y Boletaje", href: "/eventos" },
+  experiencia: { titulo: "Experiencias", href: "/experiencias" },
+};
+
+function iconoIncluye(item: string) {
+  const s = item.toLowerCase();
+  if (s.includes("transporte")) return Bus;
+  if (s.includes("chofer") || s.includes("vehículo")) return Car;
+  if (s.includes("guía") || s.includes("instructor")) return UserCheck;
+  if (s.includes("entrada") || s.includes("acceso") || s.includes("boleto")) return Ticket;
+  if (s.includes("snack") || s.includes("food")) return Coffee;
+  if (s.includes("agua")) return Droplet;
+  if (s.includes("seguro")) return Shield;
+  if (s.includes("wifi")) return Wifi;
+  if (s.includes("cocina")) return UtensilsCrossed;
+  if (s.includes("ropa de cama") || s.includes("toallas")) return BedDouble;
+  if (s.includes("check-in") || s.includes("atención")) return Clock;
+  if (s.includes("equipaje")) return Backpack;
+  if (s.includes("monitoreo de vuelo")) return Plane;
+  if (s.includes("fotograf")) return Camera;
+  if (s.includes("casillero") || s.includes("seguridad")) return Lock;
+  return CheckCircle2;
+}
+
+function whatsappHref(titulo: string) {
+  const texto = `Hola, tengo una pregunta sobre: ${titulo}`;
+  return `https://wa.me/525575653059?text=${encodeURIComponent(texto)}`;
+}
 
 export async function ListingDetail({
   listing,
@@ -43,11 +109,31 @@ export async function ListingDetail({
     metadata: { tipo: listing.tipo },
   });
 
-  const zonas = (listing.itinerario as Array<{ zonas?: Zona[] }> | null)?.[0]
-    ?.zonas;
+  const itinerario = (listing.itinerario ?? null) as Itinerario | null;
+  const pasos = itinerario?.pasos;
+  const zonas = itinerario?.zonas;
+  const relacionados = await getListingsRelacionados(listing, 4);
+  const categoria = CATEGORIA_BREADCRUMB[listing.tipo];
+  const proximaSalida = disponibilidad[0]?.fecha;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12">
+      <nav className="mb-4 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-foreground">
+          Inicio
+        </Link>
+        {categoria && (
+          <>
+            <span>/</span>
+            <Link href={categoria.href} className="hover:text-foreground">
+              {categoria.titulo}
+            </Link>
+          </>
+        )}
+        <span>/</span>
+        <span className="text-foreground">{listing.titulo}</span>
+      </nav>
+
       {listing.imagenes && listing.imagenes.length > 0 && (
         <div className="mb-8 grid grid-cols-1 gap-2 overflow-hidden rounded-lg sm:grid-cols-3">
           <div className="relative aspect-[4/3] sm:col-span-2">
@@ -78,12 +164,17 @@ export async function ListingDetail({
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
         <div className="flex flex-col gap-4 lg:col-span-2">
-          {listing.duracion && (
-            <Badge className="w-fit">{listing.duracion}</Badge>
-          )}
-          <h1 className="font-heading text-3xl md:text-4xl">
-            {listing.titulo}
-          </h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="w-fit">{TIPO_BADGE[listing.tipo] ?? listing.tipo}</Badge>
+            {listing.duracion && <Badge variant="outline">{listing.duracion}</Badge>}
+            {listing.dificultad && <Badge variant="outline">{listing.dificultad}</Badge>}
+            {proximaSalida && (
+              <Badge variant="outline">
+                Próxima salida: {fecha.format(new Date(`${proximaSalida}T00:00:00`))}
+              </Badge>
+            )}
+          </div>
+          <h1 className="font-heading text-3xl md:text-4xl">{listing.titulo}</h1>
           {listing.ubicacion && (
             <p className="text-muted-foreground">{listing.ubicacion}</p>
           )}
@@ -91,6 +182,22 @@ export async function ListingDetail({
             <p className="max-w-2xl leading-relaxed text-foreground/90">
               {listing.descripcion}
             </p>
+          )}
+
+          {pasos && pasos.length > 0 && (
+            <div className="mt-4">
+              <h2 className="mb-3 font-heading text-lg">El itinerario</h2>
+              <ol className="flex flex-col gap-4 border-l-2 border-border pl-4">
+                {pasos.map((p, i) => (
+                  <li key={i} className="relative">
+                    <span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-accent" />
+                    <p className="text-sm font-medium tabular-nums text-accent">{p.hora}</p>
+                    <p className="font-heading text-base">{p.titulo}</p>
+                    <p className="text-sm text-muted-foreground">{p.descripcion}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
           )}
 
           {zonas && zonas.length > 0 && (
@@ -111,6 +218,44 @@ export async function ListingDetail({
               </ul>
             </div>
           )}
+
+          {listing.que_incluye && listing.que_incluye.length > 0 && (
+            <div className="mt-4">
+              <h2 className="mb-3 font-heading text-lg">¿Qué incluye?</h2>
+              <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {listing.que_incluye.map((item) => {
+                  const Icono = iconoIncluye(item);
+                  return (
+                    <li key={item} className="flex items-center gap-2 text-sm">
+                      <Icono className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+                      {item}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {listing.cancelaciones && (
+            <div className="mt-4">
+              <h2 className="mb-2 font-heading text-lg">Cancelaciones</h2>
+              <p className="text-sm text-muted-foreground">{listing.cancelaciones}</p>
+            </div>
+          )}
+
+          <div className="mt-2">
+            <Button asChild variant="outline" size="sm">
+              <a
+                href={whatsappHref(listing.titulo)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="gap-2"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                Preguntar por WhatsApp
+              </a>
+            </Button>
+          </div>
 
           <div className="mt-4">
             <h2 className="mb-2 font-heading text-lg">Reseñas</h2>
@@ -168,6 +313,21 @@ export async function ListingDetail({
           </CardContent>
         </Card>
       </div>
+
+      {relacionados.length > 0 && (
+        <div className="mt-16">
+          <h2 className="mb-6 font-heading text-2xl">También te puede gustar</h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {relacionados.map((r) => (
+              <ListingCard
+                key={r.id}
+                listing={r}
+                href={DETAIL_HREF[r.tipo]?.(r.slug)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
