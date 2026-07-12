@@ -122,6 +122,18 @@ Migración `0021` (`afiliados`/`operadores.wallet_address`) y `0023` (`ordenes.r
 
 ---
 
+## Ronda de calidad visual y estabilidad (post-Etapa 4)
+
+Auditoría sistemática de todas las páginas del sistema (servidor real, sesión real de los 5 roles) en escritorio (1440px) y móvil (375px). Ver `AUDITORIA.md` para la lista completa de hallazgos por severidad y evidencia.
+
+Hallazgos críticos corregidos: KPIs truncados a "$..." en 4 dashboards por un sparkline de ancho fijo compitiendo con el número; tabla del catálogo B2B perdiendo columnas de precio en móvil (faltaba `min-width` para que el scroll horizontal funcionara de verdad); headers de 5 dashboards desbordándose en móvil por falta de `flex-wrap`; 3 órdenes reales con precio $0 por un fallback silencioso en `cartItemPrice` (el checkout ahora rechaza la compra si algún ítem no tiene precio válido, en vez de cobrar $0); badge de agencia vacío en `/paquetes` por RLS bloqueando la lectura pública de `agencias.razon_social` (nueva vista `agencias_publico`, migración `0028`); y ausencia total de menú de navegación en móvil (no existía ninguna alternativa al `<nav>` `hidden md:flex` del header — se agregó `MobileNav`).
+
+Además: helper de moneda centralizado (`lib/format.ts`, reemplaza 22 formateadores duplicados), formato de números consistente en los ejes de `TopBarChart`, botón flotante del chatbot más chico en móvil para no superponerse con contenido, y estados vacíos con ícono + acción en las pantallas clave del pitch.
+
+Verificación blockchain end-to-end repetida con una wallet de prueba fondeada firmando `crearReserva()` directo en Sepolia (mismo llamado que firmaría Privy/MetaMask) — reserva confirmada on-chain, verificada por `/api/checkout/crypto`, NFT acuñado con `ownerOf` coincidiendo con la wallet compradora, y prueba de falla real (`value=0` revierte con `"monto requerido"`) confirmando que ninguna orden se crea si la transacción falla.
+
+---
+
 ## Checklist de criterios de aceptación (sección 9 del spec)
 
 - [x] Repo con estructura de carpetas clara, `.env.example`, migraciones SQL, seeds.
