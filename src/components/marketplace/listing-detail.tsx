@@ -277,7 +277,15 @@ export async function ListingDetail({
           )}
 
           <div className="mt-4">
-            <h2 className="mb-2 font-heading text-lg">Reseñas</h2>
+            <div className="mb-2 flex items-center gap-2">
+              <h2 className="font-heading text-lg">Reseñas</h2>
+              {resenas.length > 0 && (
+                <span className="text-sm text-muted-foreground">
+                  {(resenas.reduce((sum, r) => sum + r.rating, 0) / resenas.length).toFixed(1)} ★
+                  ({resenas.length})
+                </span>
+              )}
+            </div>
             {resenas.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Aún no hay reseñas para esta experiencia.
@@ -286,7 +294,13 @@ export async function ListingDetail({
               <ul className="flex flex-col gap-3">
                 {resenas.map((r) => (
                   <li key={r.id} className="rounded-md border border-border p-3 text-sm">
-                    <span className="font-medium">{"★".repeat(r.rating)}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{r.autor_nombre ?? "Viajero Rutaru"}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {fecha.format(new Date(r.created_at))}
+                      </span>
+                    </div>
+                    <span className="text-amber-600">{"★".repeat(r.rating)}</span>
                     {r.comentario && <p className="mt-1">{r.comentario}</p>}
                   </li>
                 ))}

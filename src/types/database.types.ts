@@ -512,6 +512,7 @@ export type Database = {
           user_id: string;
           rating: number;
           comentario: string | null;
+          autor_nombre: string | null;
           created_at: string;
         };
         Insert: {
@@ -520,6 +521,7 @@ export type Database = {
           user_id: string;
           rating: number;
           comentario?: string | null;
+          autor_nombre?: string | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["resenas"]["Insert"]>;
@@ -735,6 +737,8 @@ export type Database = {
           activo: boolean;
           created_at: string;
           updated_at: string;
+          rating_promedio: number | null;
+          rating_count: number | null;
         };
         Relationships: [
           {

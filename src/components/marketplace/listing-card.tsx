@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Listing } from "@/lib/data/listings";
 import { formatCurrency } from "@/lib/format";
@@ -34,6 +35,13 @@ export function ListingCard({
         {listing.ubicacion && (
           <p className="text-sm text-muted-foreground">{listing.ubicacion}</p>
         )}
+        {listing.rating_count ? (
+          <p className="flex items-center gap-1 text-sm text-muted-foreground">
+            <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+            <span className="font-medium text-foreground">{listing.rating_promedio}</span>
+            <span>({listing.rating_count})</span>
+          </p>
+        ) : null}
         <div className="mt-auto flex items-baseline justify-between pt-3">
           <span className="text-lg font-semibold tabular-nums">
             {formatCurrency(listing.precio_b2c)}
