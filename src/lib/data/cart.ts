@@ -80,14 +80,15 @@ export async function addToCart(
   userId: string,
   item:
     | { listingId: string; fecha?: string; cantidad?: number }
-    | { paqueteId: string }
+    | { paqueteId: string; cantidad?: number }
 ) {
   const supabase = await createClient();
   const carritoId = await getOrCreateCarritoId(supabase, userId);
   const column = "listingId" in item ? "listing_id" : "paquete_id";
   const value = "listingId" in item ? item.listingId : item.paqueteId;
   const fecha = "listingId" in item ? (item.fecha ?? null) : null;
-  const cantidadNueva = ("listingId" in item ? item.cantidad : undefined) ?? 1;
+  const cantidadExplicita = item.cantidad;
+  const cantidadNueva = cantidadExplicita ?? 1;
 
   // Una reserva con fecha es un item independiente por fecha — no se
   // fusiona con otra reserva del mismo listing en otra fecha.
@@ -102,7 +103,9 @@ export async function addToCart(
   if (existing) {
     const { error } = await supabase
       .from("carrito_items")
-      .update({ cantidad: fecha ? cantidadNueva : existing.cantidad + 1 })
+      .update({
+        cantidad: cantidadExplicita !== undefined ? cantidadNueva : existing.cantidad + 1,
+      })
       .eq("id", existing.id);
     if (error) throw error;
     return;
@@ -116,7 +119,7 @@ export async function addToCart(
           cantidad: cantidadNueva,
           fecha_servicio: fecha,
         }
-      : { carrito_id: carritoId, paquete_id: item.paqueteId, cantidad: 1 }
+      : { carrito_id: carritoId, paquete_id: item.paqueteId, cantidad: cantidadNueva }
   );
   if (error) throw error;
 }

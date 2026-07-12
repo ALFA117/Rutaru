@@ -46,6 +46,23 @@ export async function reservarAction(formData: FormData) {
   redirect("/checkout");
 }
 
+export async function reservarPaqueteAction(formData: FormData) {
+  const paqueteId = String(formData.get("paqueteId") ?? "");
+  const pasajeros = Number(formData.get("pasajeros") ?? 1);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+  if (!paqueteId) return;
+
+  await addToCart(user.id, { paqueteId, cantidad: pasajeros });
+  await track({ tipoEvento: "add_to_cart", entidad: paqueteId, metadata: { pasajeros } });
+
+  redirect("/checkout");
+}
+
 export async function removeFromCartAction(formData: FormData) {
   const itemId = String(formData.get("itemId") ?? "");
   await removeFromCart(itemId);

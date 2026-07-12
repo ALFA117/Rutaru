@@ -4,7 +4,9 @@ export async function getCatalogoB2B() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("listings")
-    .select("id, titulo, tipo, slug, ubicacion, duracion, precio_b2c, precio_neto_b2b, cupo, activo")
+    .select(
+      "id, titulo, tipo, slug, ubicacion, pais, estado, ciudad, duracion, precio_b2c, precio_neto_b2b, imagenes, que_incluye, cupo, activo"
+    )
     .order("tipo", { ascending: true })
     .order("titulo", { ascending: true });
 

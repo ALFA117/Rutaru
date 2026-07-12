@@ -253,6 +253,11 @@ export type Database = {
           componentes: Json;
           precio_total: number;
           markup_pct: number;
+          fecha_inicio: string | null;
+          fecha_fin: string | null;
+          pais: string | null;
+          estado: string | null;
+          ciudad: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -264,6 +269,11 @@ export type Database = {
           componentes?: Json;
           precio_total: number;
           markup_pct?: number;
+          fecha_inicio?: string | null;
+          fecha_fin?: string | null;
+          pais?: string | null;
+          estado?: string | null;
+          ciudad?: string | null;
           created_at?: string;
           updated_at?: string;
         };
