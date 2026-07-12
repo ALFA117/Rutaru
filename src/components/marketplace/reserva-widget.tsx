@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { Minus, Plus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -44,13 +45,19 @@ export function ReservaWidget({
     <div className="flex flex-col gap-4">
       <div>
         <p className="mb-2 text-sm font-medium">Elige una fecha</p>
-        <Calendar
-          mode="single"
-          selected={fecha}
-          onSelect={setFecha}
-          disabled={(date) => !fechasConCupo.has(format(date, "yyyy-MM-dd"))}
-          className="w-full"
-        />
+        <div className="flex justify-center rounded-lg border border-border p-1">
+          <Calendar
+            mode="single"
+            selected={fecha}
+            onSelect={setFecha}
+            disabled={(date) => !fechasConCupo.has(format(date, "yyyy-MM-dd"))}
+          />
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {fecha
+            ? `Fecha elegida: ${format(fecha, "EEEE d 'de' MMMM", { locale: es })}`
+            : "Toca un día disponible en el calendario."}
+        </p>
       </div>
 
       <div className="flex items-center justify-between">
@@ -93,6 +100,11 @@ export function ReservaWidget({
         <Button size="lg" type="submit" className="w-full" disabled={!fecha}>
           Reservar
         </Button>
+        {!fecha && (
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Elige una fecha arriba para poder reservar.
+          </p>
+        )}
       </form>
     </div>
   );

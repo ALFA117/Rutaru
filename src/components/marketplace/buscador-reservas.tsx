@@ -50,7 +50,7 @@ export function BuscadorReservas({ ciudades }: { ciudades: string[] }) {
   }
 
   return (
-    <Card className="mx-auto -mt-10 w-[calc(100%-2rem)] max-w-5xl shadow-lg sm:-mt-14">
+    <Card className="mx-auto mt-6 w-[calc(100%-2rem)] max-w-5xl shadow-lg sm:mt-8">
       <CardContent className="grid grid-cols-1 gap-4 p-4 sm:p-6 lg:grid-cols-6">
         <div className="flex flex-col gap-1.5 lg:col-span-2">
           <Label>Paquetes turísticos</Label>
