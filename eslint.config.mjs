@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Codigo generado (artifacts de Hardhat + tipos de Typechain), no es
+    // codigo de la app y no vale la pena lintearlo.
+    "contracts/artifacts/**",
+    "contracts/types/**",
   ]),
 ]);
 
