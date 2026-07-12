@@ -31,9 +31,12 @@ export async function getAdminDashboardData(rango: RangoFechas = 30) {
   const supabase = await createClient();
   const desde = fechaDesde(rango);
 
+  // Sin .limit() explicito, PostgREST tope por defecto en 1000 filas --
+  // events_tracking ya lo supera facil en el rango de 30/90 dias.
   let eventosQuery = supabase
     .from("events_tracking")
-    .select("tipo_evento, created_at");
+    .select("tipo_evento, created_at")
+    .limit(20000);
   if (desde) eventosQuery = eventosQuery.gte("created_at", desde);
 
   let ordenItemsQuery = supabase

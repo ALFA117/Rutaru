@@ -79,7 +79,8 @@ async function tendenciasPorTemporada() {
 
 async function funnelConversion() {
   const supabase = await createClient();
-  const { data } = await supabase.from("events_tracking").select("tipo_evento");
+  // Sin .limit(), PostgREST tope en 1000 filas por defecto.
+  const { data } = await supabase.from("events_tracking").select("tipo_evento").limit(20000);
   const counts = new Map<string, number>();
   for (const e of data ?? []) {
     counts.set(e.tipo_evento, (counts.get(e.tipo_evento) ?? 0) + 1);
