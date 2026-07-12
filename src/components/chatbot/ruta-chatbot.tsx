@@ -86,7 +86,7 @@ export function RutaChatbot() {
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
       {open && (
-        <div className="flex h-[28rem] w-80 flex-col overflow-hidden rounded-lg border border-border bg-card shadow-xl sm:w-96">
+        <div className="flex h-[min(28rem,70vh)] w-80 flex-col overflow-hidden rounded-lg border border-border bg-card shadow-xl sm:w-96">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <span className="font-heading text-base">Ruta — asistente</span>
             <button

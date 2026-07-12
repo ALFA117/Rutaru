@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { CATEGORIAS } from "@/lib/data/categorias";
 import { BLOCKCHAIN_ENABLED } from "@/config/flags";
 import { ConnectWalletButton } from "@/components/blockchain/connect-wallet-button";
-import { MobileNav } from "@/components/layout/mobile-nav";
+import { CategoryMarquee } from "@/components/layout/category-marquee";
 import { NavLink } from "@/components/layout/nav-link";
+
+const MARQUEE_ITEMS = [...CATEGORIAS, { titulo: "Artículos", href: "/articulos" }];
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -40,14 +42,15 @@ export async function SiteHeader() {
           <NavLink href="/articulos">Artículos</NavLink>
         </nav>
 
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           {BLOCKCHAIN_ENABLED && <ConnectWalletButton />}
           <Button asChild size="sm" className="min-h-11">
             <Link href={accountHref}>{user ? "Mi cuenta" : "Iniciar sesión"}</Link>
           </Button>
-          <MobileNav categorias={CATEGORIAS} />
         </div>
       </div>
+
+      <CategoryMarquee items={MARQUEE_ITEMS} />
     </header>
   );
 }

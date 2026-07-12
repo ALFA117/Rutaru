@@ -65,7 +65,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 sm:p-10">
+              <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 pb-10 sm:p-10 sm:pb-16">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge className="w-fit bg-accent text-accent-foreground">
                     {TIPO_LABEL[s.tipo] ?? s.tipo}
@@ -92,8 +92,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-4" />
-      <CarouselNext className="right-4" />
+      <CarouselPrevious className="hidden left-4 bg-white/90 backdrop-blur-sm sm:flex" />
+      <CarouselNext className="hidden right-4 bg-white/90 backdrop-blur-sm sm:flex" />
       <div className="absolute inset-x-0 bottom-2 flex justify-center gap-1.5 sm:hidden">
         {slides.map((s, i) => (
           <button
