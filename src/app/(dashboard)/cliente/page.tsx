@@ -85,6 +85,8 @@ export default async function ClientePage() {
                       <li key={item.id} className="flex flex-wrap items-center gap-2">
                         <span>
                           {item.listings?.titulo ?? item.paquetes?.titulo} × {item.cantidad}
+                          {item.fecha_servicio &&
+                            ` — ${fecha.format(new Date(`${item.fecha_servicio}T00:00:00`))}`}
                         </span>
                         {item.nft_tickets?.[0] && (
                           <a

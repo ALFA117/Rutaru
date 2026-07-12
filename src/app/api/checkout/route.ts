@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCartItems, clearCart, cartItemPrice } from "@/lib/data/cart";
+import { verificarDisponibilidad, descontarDisponibilidad } from "@/lib/data/disponibilidad";
 import { chargeSandbox, type MetodoPago } from "@/lib/pioneer-pay/sandbox";
 import { track } from "@/lib/tracking/track";
 
@@ -54,6 +55,12 @@ export async function POST(request: Request) {
   const descuento = Math.round(subtotal * (descuentoPct / 100));
   const total = subtotal - descuento;
 
+  const admin = createAdminClient();
+  const disponibilidadCheck = await verificarDisponibilidad(admin, items);
+  if (!disponibilidadCheck.ok) {
+    return NextResponse.json({ error: disponibilidadCheck.error }, { status: 409 });
+  }
+
   const cargo = await chargeSandbox(metodoPago, total);
 
   const { data: orden, error: ordenError } = await supabase
@@ -84,6 +91,7 @@ export async function POST(request: Request) {
     paquete_id: item.paquete_id,
     cantidad: item.cantidad,
     precio: cartItemPrice(item),
+    fecha_servicio: item.fecha_servicio,
   }));
 
   const { error: itemsError } = await supabase
@@ -92,6 +100,8 @@ export async function POST(request: Request) {
   if (itemsError) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
+
+  await descontarDisponibilidad(admin, items);
 
   const { error: pagoError } = await supabase.from("pagos").insert({
     orden_id: orden.id,

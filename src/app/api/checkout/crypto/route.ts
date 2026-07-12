@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCartItems, clearCart, cartItemPrice } from "@/lib/data/cart";
+import { verificarDisponibilidad, descontarDisponibilidad } from "@/lib/data/disponibilidad";
 import { track } from "@/lib/tracking/track";
 import {
   verificarReservaCreada,
@@ -80,6 +81,11 @@ export async function POST(request: Request) {
   const descuento = Math.round(subtotal * (descuentoPct / 100));
   const total = subtotal - descuento;
 
+  const disponibilidadCheck = await verificarDisponibilidad(admin, items);
+  if (!disponibilidadCheck.ok) {
+    return NextResponse.json({ error: disponibilidadCheck.error }, { status: 409 });
+  }
+
   const { data: orden, error: ordenError } = await supabase
     .from("ordenes")
     .insert({
@@ -111,15 +117,37 @@ export async function POST(request: Request) {
     paquete_id: item.paquete_id,
     cantidad: item.cantidad,
     precio: cartItemPrice(item),
+    fecha_servicio: item.fecha_servicio,
   }));
 
-  const { data: ordenItems, error: itemsError } = await supabase
+  const { data: ordenItemsRaw, error: itemsError } = await supabase
     .from("orden_items")
     .insert(ordenItemsInsert)
-    .select("id, listing_id, listings(titulo, tipo)");
+    .select("id, listing_id");
   if (itemsError) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
+
+  // listings (tabla base) no tiene SELECT publico para el cliente; se
+  // resuelve titulo/tipo contra listings_publico aparte (ver nota en
+  // lib/data/cart.ts).
+  const listingIdsMint = [
+    ...new Set((ordenItemsRaw ?? []).map((i) => i.listing_id).filter(Boolean)),
+  ] as string[];
+  const listingsMintById = new Map<string, { titulo: string; tipo: string }>();
+  if (listingIdsMint.length > 0) {
+    const { data: listingsMint } = await supabase
+      .from("listings_publico")
+      .select("id, titulo, tipo")
+      .in("id", listingIdsMint);
+    for (const l of listingsMint ?? []) listingsMintById.set(l.id, l);
+  }
+  const ordenItems = (ordenItemsRaw ?? []).map((item) => ({
+    ...item,
+    listings: item.listing_id ? (listingsMintById.get(item.listing_id) ?? null) : null,
+  }));
+
+  await descontarDisponibilidad(admin, items);
 
   await supabase.from("pagos").insert({
     orden_id: orden.id,

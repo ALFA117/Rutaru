@@ -25,13 +25,41 @@ export async function getCartItems(userId: string) {
   const supabase = await createClient();
   const carritoId = await getOrCreateCarritoId(supabase, userId);
 
-  const { data, error } = await supabase
+  // carrito_items.listing_id apunta a la tabla base `listings`, pero esa
+  // tabla no tiene SELECT publico para cliente/afiliado (Etapa 3 lo retiro
+  // para ocultar precio_neto_b2b) — un embed directo `listings(*)` aqui
+  // devuelve null por RLS y silenciosamente pone el precio en $0. Se
+  // resuelve en dos pasos contra `listings_publico`, que si es publica.
+  const { data: items, error } = await supabase
     .from("carrito_items")
-    .select("*, listings(*, operadores(wallet_address)), paquetes(*)")
+    .select("*, paquetes(*)")
     .eq("carrito_id", carritoId)
     .order("created_at", { ascending: true });
   if (error) throw error;
-  return data;
+
+  const listingIds = [...new Set(items.map((i) => i.listing_id).filter(Boolean))] as string[];
+  const listingsById = new Map<string, unknown>();
+  if (listingIds.length > 0) {
+    const { data: listings, error: listingsError } = await supabase
+      .from("listings_publico")
+      .select("*, operadores(wallet_address)")
+      .in("id", listingIds);
+    if (listingsError) throw listingsError;
+    for (const l of listings) listingsById.set(l.id, l);
+  }
+
+  return items.map((item) => ({
+    ...item,
+    listings: item.listing_id ? (listingsById.get(item.listing_id) ?? null) : null,
+  })) as unknown as Array<
+    (typeof items)[number] & {
+      listings:
+        | (Database["public"]["Views"]["listings_publico"]["Row"] & {
+            operadores: { wallet_address: string | null } | null;
+          })
+        | null;
+    }
+  >;
 }
 
 export function cartItemPrice(item: {
@@ -50,24 +78,31 @@ export function cartItemTitle(item: {
 
 export async function addToCart(
   userId: string,
-  item: { listingId: string } | { paqueteId: string }
+  item:
+    | { listingId: string; fecha?: string; cantidad?: number }
+    | { paqueteId: string }
 ) {
   const supabase = await createClient();
   const carritoId = await getOrCreateCarritoId(supabase, userId);
   const column = "listingId" in item ? "listing_id" : "paquete_id";
   const value = "listingId" in item ? item.listingId : item.paqueteId;
+  const fecha = "listingId" in item ? (item.fecha ?? null) : null;
+  const cantidadNueva = ("listingId" in item ? item.cantidad : undefined) ?? 1;
 
-  const { data: existing } = await supabase
+  // Una reserva con fecha es un item independiente por fecha — no se
+  // fusiona con otra reserva del mismo listing en otra fecha.
+  let query = supabase
     .from("carrito_items")
     .select("id, cantidad")
     .eq("carrito_id", carritoId)
-    .eq(column, value)
-    .maybeSingle();
+    .eq(column, value);
+  query = fecha ? query.eq("fecha_servicio", fecha) : query.is("fecha_servicio", null);
+  const { data: existing } = await query.maybeSingle();
 
   if (existing) {
     const { error } = await supabase
       .from("carrito_items")
-      .update({ cantidad: existing.cantidad + 1 })
+      .update({ cantidad: fecha ? cantidadNueva : existing.cantidad + 1 })
       .eq("id", existing.id);
     if (error) throw error;
     return;
@@ -75,7 +110,12 @@ export async function addToCart(
 
   const { error } = await supabase.from("carrito_items").insert(
     "listingId" in item
-      ? { carrito_id: carritoId, listing_id: item.listingId, cantidad: 1 }
+      ? {
+          carrito_id: carritoId,
+          listing_id: item.listingId,
+          cantidad: cantidadNueva,
+          fecha_servicio: fecha,
+        }
       : { carrito_id: carritoId, paquete_id: item.paqueteId, cantidad: 1 }
   );
   if (error) throw error;

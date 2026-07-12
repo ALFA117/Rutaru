@@ -19,7 +19,14 @@ export async function getOperadorDashboardData(userId: string) {
   const listingIds = (listings ?? []).map((l) => l.id);
 
   if (listingIds.length === 0) {
-    return { operador, listings: [], ventas: [], totales: emptyTotales() };
+    return {
+      operador,
+      listings: [],
+      ventas: [],
+      totales: emptyTotales(),
+      topListings: [],
+      reservasProximas: [],
+    };
   }
 
   const { data: ventas } = await supabase
@@ -77,6 +84,16 @@ export async function getOperadorDashboardData(userId: string) {
     .sort((a, b) => b.reservas - a.reservas)
     .slice(0, 5);
 
+  const { data: reservasProximas } = await supabase
+    .from("orden_items")
+    .select("id, cantidad, fecha_servicio, listings(titulo), ordenes!inner(estado, created_at)")
+    .in("listing_id", listingIds)
+    .not("fecha_servicio", "is", null)
+    .gte("fecha_servicio", new Date().toISOString().slice(0, 10))
+    .in("ordenes.estado", ["pagada", "confirmada", "completada"])
+    .order("fecha_servicio", { ascending: true })
+    .limit(10);
+
   return {
     operador,
     listings: listings ?? [],
@@ -88,6 +105,7 @@ export async function getOperadorDashboardData(userId: string) {
       ticketPromedio: totalReservas > 0 ? Math.round(totalVentas / totalReservas) : 0,
     },
     topListings,
+    reservasProximas: reservasProximas ?? [],
   };
 }
 

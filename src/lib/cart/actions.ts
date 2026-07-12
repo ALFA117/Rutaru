@@ -28,6 +28,24 @@ export async function addToCartAction(formData: FormData) {
   redirect("/carrito");
 }
 
+export async function reservarAction(formData: FormData) {
+  const listingId = String(formData.get("listingId") ?? "");
+  const fecha = String(formData.get("fecha") ?? "");
+  const cantidad = Number(formData.get("cantidad") ?? 1);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+  if (!listingId || !fecha) return;
+
+  await addToCart(user.id, { listingId, fecha, cantidad });
+  await track({ tipoEvento: "add_to_cart", entidad: listingId, metadata: { fecha, cantidad } });
+
+  redirect("/checkout");
+}
+
 export async function removeFromCartAction(formData: FormData) {
   const itemId = String(formData.get("itemId") ?? "");
   await removeFromCart(itemId);

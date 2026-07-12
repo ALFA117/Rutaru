@@ -28,6 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ListingCard } from "@/components/marketplace/listing-card";
+import { ReservaWidget } from "@/components/marketplace/reserva-widget";
 import type { Listing } from "@/lib/data/listings";
 import { getListingsRelacionados } from "@/lib/data/listings";
 import { getArticulosPorListing } from "@/lib/data/articulos";
@@ -311,28 +312,39 @@ export async function ListingDetail({
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            {disponibilidad.length > 0 ? (
-              <div>
-                <p className="mb-2 text-sm font-medium">Próximas fechas</p>
-                <div className="flex flex-wrap gap-2">
-                  {disponibilidad.slice(0, 6).map((d) => (
-                    <Badge key={d.id} variant="outline">
-                      {fecha.format(new Date(`${d.fecha}T00:00:00`))}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+            {listing.tipo === "evento" ? (
+              <>
+                {disponibilidad.length > 0 ? (
+                  <div>
+                    <p className="mb-2 text-sm font-medium">Próximas fechas</p>
+                    <div className="flex flex-wrap gap-2">
+                      {disponibilidad.slice(0, 6).map((d) => (
+                        <Badge key={d.id} variant="outline">
+                          {fecha.format(new Date(`${d.fecha}T00:00:00`))}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Consulta disponibilidad directamente.
+                  </p>
+                )}
+                <form action={addToCartAction}>
+                  <input type="hidden" name="listingId" value={listing.id} />
+                  <Button size="lg" type="submit" className="w-full">
+                    Agregar al carrito
+                  </Button>
+                </form>
+              </>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                Consulta disponibilidad directamente.
-              </p>
+              <ReservaWidget
+                listingId={listing.id}
+                tipo={listing.tipo}
+                precioB2c={listing.precio_b2c}
+                disponibilidad={disponibilidad}
+              />
             )}
-            <form action={addToCartAction}>
-              <input type="hidden" name="listingId" value={listing.id} />
-              <Button size="lg" type="submit" className="w-full">
-                Agregar al carrito
-              </Button>
-            </form>
           </CardContent>
         </Card>
       </div>

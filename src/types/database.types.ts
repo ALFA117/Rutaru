@@ -307,6 +307,7 @@ export type Database = {
           listing_id: string | null;
           paquete_id: string | null;
           cantidad: number;
+          fecha_servicio: string | null;
           created_at: string;
         };
         Insert: {
@@ -315,6 +316,7 @@ export type Database = {
           listing_id?: string | null;
           paquete_id?: string | null;
           cantidad?: number;
+          fecha_servicio?: string | null;
           created_at?: string;
         };
         Update: Partial<

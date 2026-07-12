@@ -16,11 +16,24 @@ export default async function VerificarPage({
 
   const { data: nftTicket } = await supabase
     .from("nft_tickets")
-    .select("*, orden_items(listings(titulo, tipo))")
+    .select("*, orden_items(listing_id)")
     .eq("token_id", Number(tokenId))
     .maybeSingle();
 
   if (!nftTicket) notFound();
+
+  // listings (tabla base) no tiene SELECT publico para anon; se resuelve
+  // el titulo contra listings_publico aparte (ver nota en lib/data/cart.ts).
+  let listingTitulo: string | null = null;
+  const listingId = nftTicket.orden_items?.listing_id;
+  if (listingId) {
+    const { data: listing } = await supabase
+      .from("listings_publico")
+      .select("titulo")
+      .eq("id", listingId)
+      .maybeSingle();
+    listingTitulo = listing?.titulo ?? null;
+  }
 
   let onChain;
   try {
@@ -68,10 +81,10 @@ export default async function VerificarPage({
             <span className="text-muted-foreground">Dueño actual</span>
             <code className="text-xs">{onChain.owner}</code>
           </div>
-          {nftTicket.orden_items?.listings?.titulo && (
+          {listingTitulo && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">Reserva</span>
-              <span>{nftTicket.orden_items.listings.titulo}</span>
+              <span>{listingTitulo}</span>
             </div>
           )}
           <a

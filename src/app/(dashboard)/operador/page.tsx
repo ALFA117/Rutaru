@@ -44,7 +44,7 @@ export default async function OperadorPage() {
     );
   }
 
-  const { operador, totales, ventas, topListings, listings } = data;
+  const { operador, totales, ventas, topListings, listings, reservasProximas } = data;
   const reservasBlockchain = BLOCKCHAIN_ENABLED
     ? await getReservasBlockchainPendientes(operador.id)
     : [];
@@ -113,6 +113,38 @@ export default async function OperadorPage() {
               </li>
             ))}
           </ul>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="font-heading text-lg">
+            Próximas reservas ({reservasProximas.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {reservasProximas.length === 0 ? (
+            <p className="py-4 text-sm text-muted-foreground">
+              No hay reservas con fecha próxima todavía.
+            </p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-border">
+              {reservasProximas.map((r) => (
+                <li key={r.id} className="flex justify-between py-2 text-sm">
+                  <span>
+                    {r.listings?.titulo} × {r.cantidad}
+                  </span>
+                  <span className="tabular-nums text-muted-foreground">
+                    {r.fecha_servicio &&
+                      new Intl.DateTimeFormat("es-MX", {
+                        day: "numeric",
+                        month: "short",
+                      }).format(new Date(`${r.fecha_servicio}T00:00:00`))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
 
